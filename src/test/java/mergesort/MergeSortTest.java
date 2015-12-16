@@ -63,6 +63,6 @@ public class MergeSortTest {
         if (centerCursor > right)
             System.arraycopy(numbers, leftCursor, tmp, tmpCursor, center - leftCursor);
 
-        System.arraycopy(tmp, 0, numbers, 0, right + 1 - left);
+        System.arraycopy(tmp, 0, numbers, left, right + 1 - left);
     }
 }
