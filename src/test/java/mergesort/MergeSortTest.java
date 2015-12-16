@@ -11,9 +11,6 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
 public class MergeSortTest {
-    /**
-     * Method used by JUnitParamsRunner to build the scenarios with their parameters.
-     */
     @SuppressWarnings("unused")
     protected Object parametersForTestMergeSort() {
         return new Object[]{//
