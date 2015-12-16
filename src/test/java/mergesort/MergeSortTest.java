@@ -5,19 +5,40 @@ import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static junitparams.JUnitParamsRunner.$;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
 public class MergeSortTest {
+    /**
+     * Method used by JUnitParamsRunner to build the scenarios with their parameters.
+     */
+    @SuppressWarnings("unused")
+    protected Object parametersForTestMergeSort() {
+        return new Object[]{//
+                $(new int[0], new int[0]), //
+
+                $(new int[]{1, 0}, new int[]{0, 1}), //
+
+                $(new int[]{1, 2, 0}, new int[]{0, 1, 2}), //
+                $(new int[]{2, 0, 1}, new int[]{0, 1, 2}), //
+
+                $(new int[]{3, 2, 1, 0}, new int[]{0, 1, 2, 3}), //
+                $(new int[]{4, 3, 2, 1, 0}, new int[]{0, 1, 2, 3, 4}) //
+        };
+    }
+
+    @Test
+    @Parameters
+    public void testMergeSort(int[] numbers, int[] expected) {
+        MergeSort.mergeSort(numbers);
+        assertThat(numbers, is(expected));
+    }
 
     @SuppressWarnings("unused")
-    protected List<Object> parametersForTestMerge() {
-        Object[] scenarios = {//
+    protected Object parametersForTestMerge() {
+        return new Object[]{//
                 $(new int[0], new int[0]), //
 
                 $(new int[]{0}, new int[]{0}), //
@@ -35,34 +56,13 @@ public class MergeSortTest {
 
                 $(new int[]{1, 5, 2, 3, 4}, new int[]{1, 2, 3, 4, 5}), //
         };
-        return Arrays.asList(scenarios);
     }
 
     @Test
     @Parameters
     public void testMerge(int[] numbers, int[] expected) {
-        merge(numbers, new int[numbers.length], 0, numbers.length / 2, numbers.length - 1);
+        MergeSort.merge(numbers, new int[numbers.length], 0, numbers.length / 2, numbers.length);
         assertThat(numbers, is(expected));
     }
 
-    private void merge(int[] numbers, int[] tmp, int left, int center, int right) {
-        int leftCursor = left;
-        int centerCursor = center;
-        int tmpCursor = 0;
-
-        while (leftCursor < center && centerCursor <= right) {
-            if (numbers[leftCursor] < numbers[centerCursor])
-                tmp[tmpCursor++] = numbers[leftCursor++];
-            else
-                tmp[tmpCursor++] = numbers[centerCursor++];
-        }
-
-        if (leftCursor == center)
-            System.arraycopy(numbers, centerCursor, tmp, tmpCursor, right - centerCursor + 1);
-
-        if (centerCursor > right)
-            System.arraycopy(numbers, leftCursor, tmp, tmpCursor, center - leftCursor);
-
-        System.arraycopy(tmp, 0, numbers, left, right + 1 - left);
-    }
 }
