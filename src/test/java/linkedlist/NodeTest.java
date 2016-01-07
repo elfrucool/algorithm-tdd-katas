@@ -100,9 +100,9 @@ public class NodeTest {
         fillListWithValues(node, 11, 12, 13, 14);
 
         assertEquals(11, ((int) node.get(0).getValue()));
-//        assertEquals(12, (int) node.get(1));
-//        assertEquals(13, (int) node.get(2));
-//        assertEquals(14, (int) node.get(3));
+        assertEquals(12, (int) (node.get(1).getValue()));
+        assertEquals(13, (int) (node.get(2).getValue()));
+        assertEquals(14, (int) (node.get(3).getValue()));
     }
 
     @Test
