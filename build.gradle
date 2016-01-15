@@ -18,5 +18,8 @@ dependencies {
     testCompile group: 'org.objenesis', name: 'objenesis', version:'2.2'
     testCompile group: 'cglib', name: 'cglib', version: '3.2.0'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
+
     testCompile group: 'pl.pragmatists', name: 'JUnitParams', version: '1.0.4'
+
+    testCompile group: 'de.bechte.junit', name: 'junit-hierarchicalcontextrunner', version: '4.12.1ª'
 }
