@@ -21,5 +21,5 @@ dependencies {
 
     testCompile group: 'pl.pragmatists', name: 'JUnitParams', version: '1.0.4'
 
-    testCompile group: 'de.bechte.junit', name: 'junit-hierarchicalcontextrunner', version: '4.12.1'
+    testCompile group: 'de.bechte.junit', name: 'junit-hierarchicalcontextrunner', version: '4.12.1ª'
 }
