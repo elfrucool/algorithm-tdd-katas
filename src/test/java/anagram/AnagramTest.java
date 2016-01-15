@@ -1,12 +1,15 @@
 package anagram;
 
+import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(HierarchicalContextRunner.class)
 public class AnagramTest {
     private Anagram anagram;
 
