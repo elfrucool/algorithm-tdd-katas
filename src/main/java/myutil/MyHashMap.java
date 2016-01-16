@@ -88,10 +88,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private <R> R doWithEntry(List<MyEntry<K, V>> entries, K key,
-                              Function<MyEntry<K, V>, R> whenFound, Supplier<R> whenNotFound) {
+                              Function<MyEntry<K, V>, R> whenFound, Supplier<R> whenNotFound)
+    {
         for (MyEntry<K, V> e : entries)
             if (e.isSameKey(key))
                 return whenFound.apply(e);
+
         return whenNotFound.get();
     }
 
