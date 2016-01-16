@@ -13,9 +13,14 @@ public class MyHashMapTest {
     // ====
     // [ok] 1. implement basic methods with none/single key-value:
     //          isEmpty(), put(), size(), containsKey(), get(), remove()
-    // 2. support more than one key-value
-    // 3. support hashCode() collision : FB <=> Ea : will use LinkedList internally
+    // [ok] 2. support more than one key-value
+    // [ok] 3. support hashCode() collision : FB <=> Ea : will use LinkedList internally
     // 4. support resize
+
+    private static void assertEntry(MyMap<String, Integer> map, String key, Integer value) {
+        assertTrue(map.containsKey(key));
+        assertEquals(value, map.get(key));
+    }
 
     private MyMap<String, Integer> map;
 
@@ -85,7 +90,8 @@ public class MyHashMapTest {
         @Test
         public void canUpdateValueUsingSameKey() {
             map.put("key", 123);
-            assertEquals((Integer)123, map.get("key"));
+            assertEquals((Integer) 123, map.get("key"));
+            assertEquals(1, map.size());
         }
 
         public class RemoveSupport {
@@ -116,8 +122,7 @@ public class MyHashMapTest {
             public void removeNonExistentKeyHasNoSideEffects() {
                 assertNull(map.remove("another"));
                 assertFalse(map.isEmpty());
-                assertTrue(map.containsKey("key"));
-                assertEquals((Integer)1, map.get("key"));
+                assertEntry(map, "key", 1);
                 assertEquals(1, map.size());
             }
         }
@@ -140,8 +145,61 @@ public class MyHashMapTest {
         @Test
         public void nullKeysAreSupported() {
             map.put(null, 1);
-            assertTrue(map.containsKey(null));
-            assertEquals((Integer)1, map.get(null));
+            assertEntry(map, null, 1);
+        }
+    }
+
+    public class MoreThanOneEntry {
+        public class WithoutCollision {
+            @Before
+            public void setUp() {
+                map.put("key1", 10);
+                map.put("key2", 20);
+            }
+
+            @Test
+            public void itsSizeIsTheNumberOfStoredKeys() {
+                assertEquals(2, map.size());
+            }
+
+            @Test
+            public void canCheckExistenceOfBothKeys() {
+                assertTrue(map.containsKey("key1"));
+                assertTrue(map.containsKey("key2"));
+            }
+
+            @Test
+            public void removingSingleEntryDecreasesSizeAndRemovesOnlyThatEntry() {
+                assertEquals((Integer) 10, map.remove("key1"));
+                assertEquals(1, map.size());
+                assertFalse(map.containsKey("key1"));
+                assertNull(map.get("key1"));
+                assertEntry(map, "key2", 20);
+            }
+        }
+
+        public class CollisionSupport {
+            @Test
+            public void containsKeyIsCollisionAware() {
+                map.put("FB", 1);
+                assertFalse(map.containsKey("Ea"));
+                assertTrue(map.containsKey("FB"));
+            }
+
+            @Test
+            public void getIsCollisionAware() {
+                map.put("FB", 1);
+                assertEquals((Integer) 1, map.get("FB"));
+                assertNull(map.get("Ea"));
+            }
+
+            @Test
+            public void canStoreTwoEntriesWithCollision() {
+                map.put("FB", 1);
+                map.put("Ea", 2);
+                assertEntry(map, "FB", 1);
+                assertEntry(map, "Ea", 2);
+            }
         }
     }
 }
