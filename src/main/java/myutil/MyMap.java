@@ -8,4 +8,8 @@ public interface MyMap<K, V> {
     boolean containsKey(K key);
 
     V get(K key);
+
+    V remove(K key);
+
+    int size();
 }
