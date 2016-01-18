@@ -1,6 +1,8 @@
 package myutil;
 
 public class MyEntry<K extends Comparable<K>, V> {
+    public enum ChildType {LEFT, RIGHT, NONE}
+
     private K key;
     private V value;
 
@@ -89,7 +91,7 @@ public class MyEntry<K extends Comparable<K>, V> {
     }
 
     public void insert(MyEntry<K, V> entry) {
-        if (entry == null)
+        if (entry == null || this == entry)
             return;
 
         if (entry.getKey().compareTo(key) < 0)
@@ -149,32 +151,41 @@ public class MyEntry<K extends Comparable<K>, V> {
         return right != null ? right.find(key) : null;
     }
 
+    public ChildType getChildType() {
+        return parent == null ? ChildType.NONE : parent.getLeft() == this ? ChildType.LEFT : ChildType.RIGHT;
+    }
+
     public MyEntry<K, V> remove() {
+        ChildType childType = getChildType();
+
         MyEntry<K, V> replacement = getReplacementAfterRemove();
 
-        MyEntry<K, V> parent = removeFromParent();
+        MyEntry<K, V> parent = removeFromParent(childType);
         MyEntry<K, V> left = removeLeft();
         MyEntry<K, V> right = removeRight();
 
-        if (left != null)
-            left.insert(right);
+        if (replacement != null) {
+            replacement.remove();
+            replacement.insert(left);
+            replacement.insert(right);
+            return replacement;
+        }
 
-        return replacement != null ? replacement : parent;
+        return parent;
     }
 
     private MyEntry<K, V> getReplacementAfterRemove() {
-        return left != null ? left : right != null ? right : null;
+        return left != null ? left.getBiggest() : right != null ? right : null;
     }
 
-    private MyEntry<K, V> removeFromParent() {
+    private MyEntry<K, V> removeFromParent(ChildType childType) {
         MyEntry<K, V> parent = this.parent;
-        if (parent != null) {
-            if (this == parent.getLeft())
-                parent.removeLeft();
-            else
-                parent.removeRight();
-            return parent;
-        }
-        return null;
+
+        if (childType == ChildType.LEFT)
+            parent.removeLeft();
+        else if (childType == ChildType.RIGHT)
+            parent.removeRight();
+
+        return parent;
     }
 }

@@ -94,7 +94,7 @@ public class TreeTest {
         }
     }
 
-    public class SingleTransformationsWithoutSorting {
+    public class SingleOperationsWithoutSorting {
         @Before
         public void setUp() {
             assignPropertiesUsingSetters(entry, "2", "two", NULL_PARENT);
@@ -136,6 +136,19 @@ public class TreeTest {
 
             assertNull(entry.getRight());
             assertNull(right.getParent());
+        }
+
+        @Test
+        public void canIdentifyTheTypeOfRelationWithParent() {
+            MyEntry<String, String> left = new MyEntry<>("1", "left");
+            MyEntry<String, String> right = new MyEntry<>("3", "right");
+
+            entry.insertLeft(left);
+            entry.insertRight(right);
+
+            assertEquals(MyEntry.ChildType.NONE, entry.getChildType());
+            assertEquals(MyEntry.ChildType.LEFT, left.getChildType());
+            assertEquals(MyEntry.ChildType.RIGHT, right.getChildType());
         }
     }
 
@@ -374,10 +387,11 @@ public class TreeTest {
 
                 @Test
                 public void removingRoot() {
-                    assertSame(left, entry.remove());
+                    assertSame(leftRight, entry.remove());
                     assertEntryIsAlone(entry);
-                    assertNull(left.getParent());
-                    assertSame(left.getRight(), right.getParent());
+                    assertNull(leftRight.getParent());
+                    assertSame(leftRight, right.getParent());
+                    assertSame(leftRight, left.getParent());
                 }
             }
         }
