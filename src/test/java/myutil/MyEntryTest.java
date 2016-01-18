@@ -315,6 +315,11 @@ public class MyEntryTest {
             }
 
             @Test
+            public void findShouldStartAtRoot() {
+                assertSame(entry.find("2.1"), leftLeft.find("2.1"));
+            }
+
+            @Test
             public void insertEntyWithSameKeyUpdatesValueAndInsertsChildren() {
                 MyEntry<String, String> updatedEntry = makeUpdatedEntryWithChildren();
                 MyEntry<String, String> updatedLeft = updatedEntry.getLeft();
@@ -375,21 +380,26 @@ public class MyEntryTest {
                     assertEntryIsAlone(entry);
                     assertSame(right, left.getRight());
                 }
-
             }
 
             public class RemovingInThreeOrMoreLevels {
-
-                private MyEntry<String, String> leftLeft = new MyEntry<>("0.1", "leftLeft");
-                private MyEntry<String, String> leftRight = new MyEntry<>("1.1", "leftRight");
-                private MyEntry<String, String> rightLeft = new MyEntry<>("2.1", "rightLeft");
-                private MyEntry<String, String> rightRight = new MyEntry<>("3.1", "rightRight");
+                // ORIGINAL STRUCTURE:
+                //      __2__
+                //     /     \
+                //    1       3
+                //   / \     / \
+                // 0.1 1.1 2.1 3.1
+                // variable names will have original position and key
+                private MyEntry<String, String> k01LeftLeft = new MyEntry<>("0.1", "leftLeft");
+                private MyEntry<String, String> k11LeftRight = new MyEntry<>("1.1", "leftRight");
+                private MyEntry<String, String> k21RightLeft = new MyEntry<>("2.1", "rightLeft");
+                private MyEntry<String, String> k31RightRight = new MyEntry<>("3.1", "rightRight");
 
                 @Before
                 public void setUp() {
                     addTwoChildrenToRootEntry();
 
-                    for (MyEntry<String, String> e : Arrays.asList(leftLeft, leftRight, rightLeft, rightRight))
+                    for (MyEntry<String, String> e : Arrays.asList(k01LeftLeft, k11LeftRight, k21RightLeft, k31RightRight))
                         entry.insert(e);
                 }
 
@@ -402,12 +412,12 @@ public class MyEntryTest {
                     //    1       3    ======>     1       3
                     //   / \     / \              /       / \
                     // 0.1 1.1 2.1 3.1          0.1     2.1 3.1
-                    assertSame(leftRight, entry.remove());
+                    assertSame(k11LeftRight, entry.remove());
 
                     assertEntryIsAlone(entry);
-                    assertNull(leftRight.getParent());
-                    assertSame(leftRight, right.getParent());
-                    assertSame(leftRight, left.getParent());
+                    assertNull(k11LeftRight.getParent());
+                    assertSame(k11LeftRight, right.getParent());
+                    assertSame(k11LeftRight, left.getParent());
                 }
 
                 @Test
@@ -419,12 +429,12 @@ public class MyEntryTest {
                     //    1       3    ======>    0.1       3
                     //   / \     / \                 \     / \
                     // 0.1 1.1 2.1 3.1              1.1  2.1 3.1
-                    assertSame(leftLeft, left.remove());
+                    assertSame(k01LeftLeft, left.remove());
 
                     assertEntryIsAlone(left);
-                    assertSame(entry, leftLeft.getParent());
-                    assertSame(leftLeft, entry.getLeft());
-                    assertSame(leftRight, leftLeft.getRight());
+                    assertSame(entry, k01LeftLeft.getParent());
+                    assertSame(k01LeftLeft, entry.getLeft());
+                    assertSame(k11LeftRight, k01LeftLeft.getRight());
                 }
 
                 @Test
@@ -436,12 +446,12 @@ public class MyEntryTest {
                     //    1       3    ======>    1      2.1
                     //   / \     / \             / \       \
                     // 0.1 1.1 2.1 3.1         0.1 1.1     3.1
-                    assertSame(rightLeft, right.remove());
+                    assertSame(k21RightLeft, right.remove());
 
                     assertEntryIsAlone(right);
-                    assertSame(entry, rightLeft.getParent());
-                    assertSame(rightLeft, entry.getRight());
-                    assertSame(rightRight, rightLeft.getRight());
+                    assertSame(entry, k21RightLeft.getParent());
+                    assertSame(k21RightLeft, entry.getRight());
+                    assertSame(k31RightRight, k21RightLeft.getRight());
                 }
 
                 @Test
@@ -453,14 +463,14 @@ public class MyEntryTest {
                     //    1       3    ======>   0.1     2.1
                     //   /       / \                       \
                     // 0.1     2.1 3.1                     3.1
-                    leftRight.remove();
+                    k11LeftRight.remove();
 
-                    assertSame(leftLeft, left.remove());
+                    assertSame(k01LeftLeft, left.remove());
 
                     assertEntryIsAlone(left);
-                    assertSame(entry, leftLeft.getParent());
-                    assertSame(leftLeft, entry.getLeft());
-                    MyEntry<String, String> entry = this.leftLeft;
+                    assertSame(entry, k01LeftLeft.getParent());
+                    assertSame(k01LeftLeft, entry.getLeft());
+                    MyEntry<String, String> entry = this.k01LeftLeft;
                     assertHasNoChildren(entry);
                 }
 
@@ -473,21 +483,22 @@ public class MyEntryTest {
                     //       0.1             1.1             2.1             3.1
                     //      /   \           /   \           /   \           /   \
                     //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1   2.1.1   3.0.1   3.1.1
-                    private MyEntry<String, String> leftLeftLeft = new MyEntry<>("0.0.1", "leftLeftLeft");
-                    private MyEntry<String, String> leftLeftRight = new MyEntry<>("0.1.1", "leftLeftRight");
-                    private MyEntry<String, String> leftRightLeft = new MyEntry<>("1.0.1", "leftRightLeft");
-                    private MyEntry<String, String> leftRightRight = new MyEntry<>("1.1.1", "leftRightRight");
-                    private MyEntry<String, String> rightLeftLeft = new MyEntry<>("2.0.1", "rightLeftLeft");
-                    private MyEntry<String, String> rightLeftRight = new MyEntry<>("2.1.1", "rightLeftRight");
-                    private MyEntry<String, String> rightRightLeft = new MyEntry<>("3.0.1", "rightRightLeft");
-                    private MyEntry<String, String> rightRightRight = new MyEntry<>("3.1.1", "rightRightRight");
+                    // variable names will have original position and key
+                    private MyEntry<String, String> k001LeftLeftLeft = new MyEntry<>("0.0.1", "leftLeftLeft");
+                    private MyEntry<String, String> k011LeftLeftRight = new MyEntry<>("0.1.1", "leftLeftRight");
+                    private MyEntry<String, String> k101LeftRightLeft = new MyEntry<>("1.0.1", "leftRightLeft");
+                    private MyEntry<String, String> k111LeftRightRight = new MyEntry<>("1.1.1", "leftRightRight");
+                    private MyEntry<String, String> k201RightLeftLeft = new MyEntry<>("2.0.1", "rightLeftLeft");
+                    private MyEntry<String, String> k211RightLeftRight = new MyEntry<>("2.1.1", "rightLeftRight");
+                    private MyEntry<String, String> k301ightRightLeft = new MyEntry<>("3.0.1", "rightRightLeft");
+                    private MyEntry<String, String> k311RightRightRight = new MyEntry<>("3.1.1", "rightRightRight");
 
                     @Before
                     public void setUp() {
                         List<MyEntry<String, String>> children =
                                 Arrays.asList(
-                                        leftLeftLeft, leftLeftRight, leftRightLeft, leftRightRight,
-                                        rightLeftLeft, rightLeftRight, rightRightLeft, rightRightRight);
+                                        k001LeftLeftLeft, k011LeftLeftRight, k101LeftRightLeft, k111LeftRightRight,
+                                        k201RightLeftLeft, k211RightLeftRight, k301ightRightLeft, k311RightRightRight);
 
                         for (MyEntry<String, String> child : children)
                             entry.insert(child);
@@ -503,16 +514,16 @@ public class MyEntryTest {
                         //       0.1             1.1             2.1             3.1
                         //      /   \           /   \           /               /   \
                         //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1           3.0.1   3.1.1
-                        assertSame(rightLeftRight, right.remove());
+                        assertSame(k211RightLeftRight, right.remove());
 
                         assertEntryIsAlone(right);
-                        assertSame(entry, rightLeftRight.getParent());
-                        assertSame(rightLeftRight, entry.getRight());
-                        assertSame(rightLeft, rightLeftRight.getLeft());
-                        assertSame(rightLeftRight, rightLeft.getParent());
-                        assertSame(rightLeftRight, rightRight.getParent());
-                        assertSame(rightRight, rightLeftRight.getRight());
-                        assertNull(rightLeft.getRight());
+                        assertSame(entry, k211RightLeftRight.getParent());
+                        assertSame(k211RightLeftRight, entry.getRight());
+                        assertSame(k21RightLeft, k211RightLeftRight.getLeft());
+                        assertSame(k211RightLeftRight, k21RightLeft.getParent());
+                        assertSame(k211RightLeftRight, k31RightRight.getParent());
+                        assertSame(k31RightRight, k211RightLeftRight.getRight());
+                        assertNull(k21RightLeft.getRight());
                     }
 
                     @Test
@@ -527,14 +538,36 @@ public class MyEntryTest {
                         //  0.0.1   0.1.1   1.0.1   1.1.1                   3.0.1   3.1.1
                         right.remove();
 
-                        assertSame(rightLeft, rightLeftRight.remove());
+                        assertSame(k21RightLeft, k211RightLeftRight.remove());
 
-                        assertEntryIsAlone(rightLeftRight);
-                        assertHasNoChildren(rightLeftLeft);
-                        assertSame(entry, rightLeft.getParent());
-                        assertSame(rightLeft, entry.getRight());
-                        assertSame(rightLeftLeft, rightLeft.getLeft());
-                        assertSame(rightRight, rightLeft.getRight());
+                        assertEntryIsAlone(k211RightLeftRight);
+                        assertHasNoChildren(k201RightLeftLeft);
+                        assertSame(entry, k21RightLeft.getParent());
+                        assertSame(k21RightLeft, entry.getRight());
+                        assertSame(k201RightLeftLeft, k21RightLeft.getLeft());
+                        assertSame(k31RightRight, k21RightLeft.getRight());
+                    }
+
+                    @Test
+                    public void whenReceivingKeyRemoveFirstSearchForKeyAndThenRemoves() {
+                        // REMOVE "3"=then=>"2.1.1":expected structure
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     ____2.1____
+                        //          /           \                   /           \
+                        //       0.1             1.1            2.0.1            3.1
+                        //      /   \           /   \                           /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1                   3.0.1   3.1.1
+                        right.remove();
+
+                        assertSame("2.1", entry.remove("2.1.1").getKey());
+
+                        assertEntryIsAlone(k211RightLeftRight);
+                        assertHasNoChildren(entry.find("2.0.1"));
+                        assertEquals("2", entry.find("2.1").getParent().getKey());
+                        assertEquals("2.1", entry.getRight().getKey());
+                        assertEquals("2.0.1", entry.find("2.1").getLeft().getKey());
+                        assertEquals("3.1", entry.find("2.1").getRight().getKey());
                     }
                 }
             }

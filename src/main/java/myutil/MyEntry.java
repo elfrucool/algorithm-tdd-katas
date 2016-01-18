@@ -150,19 +150,29 @@ public class MyEntry<K extends Comparable<K>, V> {
     }
 
     public MyEntry<K, V> find(K key) {
+        return getRoot().findFromHere(key);
+    }
+
+    // this method does not look for root
+    private MyEntry<K, V> findFromHere(K key) {
         int comparison = key.compareTo(this.key);
 
         if (comparison == 0)
             return this;
 
         if (comparison < 0)
-            return left != null ? left.find(key) : null;
+            return left != null ? left.findFromHere(key) : null;
 
-        return right != null ? right.find(key) : null;
+        return right != null ? right.findFromHere(key) : null;
     }
 
     public ChildType getChildType() {
         return parent == null ? ChildType.NONE : parent.getLeft() == this ? ChildType.LEFT : ChildType.RIGHT;
+    }
+
+    public MyEntry<K, V> remove(K key) {
+        MyEntry<K, V> found = find(key);
+        return found != null ? found.remove() : null;
     }
 
     public MyEntry<K, V> remove() {
