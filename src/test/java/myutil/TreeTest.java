@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 // 0. does not allow repetitions
 // 1. node with basic operations:
 //      [ok] - insert
-//      - remove
+//      [ok] - remove
 //      [ok] - find
 //      [ok] - getSmallest
 //      [ok] - getBiggest
@@ -40,20 +41,27 @@ public class TreeTest {
     }
 
     private static <K extends Comparable<K>, V> void assertEntryIsAlone(MyEntry<K, V> entry) {
-        assertNull(entry.getLeft());
-        assertNull(entry.getRight());
+        assertHasNoChildren(entry);
         assertNull(entry.getParent());
     }
 
-    private static <K extends Comparable<K>, V> void assertDelete(MyEntry<K, V> entry, MyEntry<K, V> expectedRoot) {
-        assertSame(expectedRoot, entry.remove());
+    private static <K extends Comparable<K>, V> void assertHasNoChildren(MyEntry<K, V> entry) {
+        assertNull(entry.getLeft());
+        assertNull(entry.getRight());
+    }
+
+    private static <K extends Comparable<K>, V> void assertDeleteSingleChild(
+            MyEntry<K, V> entry, MyEntry<K, V> expectedReplacement) //
+    {
+        assertSame(expectedReplacement, entry.remove());
         assertEntryIsAlone(entry);
-        assertNull(expectedRoot.getParent());
+        assertNull(expectedReplacement.getParent());
     }
 
     protected static final MyEntry<String, String> NULL_PARENT = null;
 
     private MyEntry<String, String> entry;
+
     @Before
     public void setUp() throws Exception {
         entry = new MyEntry<>();
@@ -331,13 +339,13 @@ public class TreeTest {
                 @Test
                 public void ifOnlyLeftIsSetWhenRemovingEntryLeftBecomesNewInPlaceEntry() {
                     entry.insert(left);
-                    assertDelete(entry, left);
+                    assertDeleteSingleChild(entry, left);
                 }
 
                 @Test
                 public void ifOnlyRightIsSetWhenRemovingEntryLeftBecomesNewInPlaceEntry() {
                     entry.insert(right);
-                    assertDelete(entry, right);
+                    assertDeleteSingleChild(entry, right);
                 }
             }
 
@@ -370,7 +378,7 @@ public class TreeTest {
 
             }
 
-            public class RemovingInThreeLevels {
+            public class RemovingInThreeOrMoreLevels {
 
                 private MyEntry<String, String> leftLeft = new MyEntry<>("0.1", "leftLeft");
                 private MyEntry<String, String> leftRight = new MyEntry<>("1.1", "leftRight");
@@ -387,11 +395,125 @@ public class TreeTest {
 
                 @Test
                 public void removingRoot() {
+                    // remove "2"
+                    //
+                    //      __2__                    _1.1_
+                    //     /     \                  /     \
+                    //    1       3    ======>     1       3
+                    //   / \     / \              /       / \
+                    // 0.1 1.1 2.1 3.1          0.1     2.1 3.1
                     assertSame(leftRight, entry.remove());
+
                     assertEntryIsAlone(entry);
                     assertNull(leftRight.getParent());
                     assertSame(leftRight, right.getParent());
                     assertSame(leftRight, left.getParent());
+                }
+
+                @Test
+                public void removingLeft() {
+                    // remove "1"
+                    //
+                    //      __2__                     __2__
+                    //     /     \                   /     \
+                    //    1       3    ======>    0.1       3
+                    //   / \     / \                 \     / \
+                    // 0.1 1.1 2.1 3.1              1.1  2.1 3.1
+                    assertSame(leftLeft, left.remove());
+
+                    assertEntryIsAlone(left);
+                    assertSame(entry, leftLeft.getParent());
+                    assertSame(leftLeft, entry.getLeft());
+                    assertSame(leftRight, leftLeft.getRight());
+                }
+
+                @Test
+                public void removingRight() {
+                    // remove "3"
+                    //
+                    //      __2__                   __2__
+                    //     /     \                 /     \
+                    //    1       3    ======>    1      2.1
+                    //   / \     / \             / \       \
+                    // 0.1 1.1 2.1 3.1         0.1 1.1     3.1
+                    assertSame(rightLeft, right.remove());
+
+                    assertEntryIsAlone(right);
+                    assertSame(entry, rightLeft.getParent());
+                    assertSame(rightLeft, entry.getRight());
+                    assertSame(rightRight, rightLeft.getRight());
+                }
+
+                @Test
+                public void removingLeftWhenHasSingleChild() {
+                    // remove "1"
+                    //
+                    //      __2__                   __2__
+                    //     /     \                 /     \
+                    //    1       3    ======>   0.1     2.1
+                    //   /       / \                       \
+                    // 0.1     2.1 3.1                     3.1
+                    leftRight.remove();
+
+                    assertSame(leftLeft, left.remove());
+
+                    assertEntryIsAlone(left);
+                    assertSame(entry, leftLeft.getParent());
+                    assertSame(leftLeft, entry.getLeft());
+                    MyEntry<String, String> entry = this.leftLeft;
+                    assertHasNoChildren(entry);
+                }
+
+                public class RemovingInFourOrMoreLevels {
+                    // STRUCTURE
+                    //                  ______________2______________
+                    //                 /                             \
+                    //           _____1_____                     _____3_____
+                    //          /           \                   /           \
+                    //       0.1             1.1             2.1             3.1
+                    //      /   \           /   \           /   \           /   \
+                    //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1   2.1.1   3.0.1   3.1.1
+                    private MyEntry<String, String> leftLeftLeft = new MyEntry<>("0.0.1", "leftLeftLeft");
+                    private MyEntry<String, String> leftLeftRight = new MyEntry<>("0.1.1", "leftLeftRight");
+                    private MyEntry<String, String> leftRightLeft = new MyEntry<>("1.0.1", "leftRightLeft");
+                    private MyEntry<String, String> leftRightRight = new MyEntry<>("1.1.1", "leftRightRight");
+                    private MyEntry<String, String> rightLeftLeft = new MyEntry<>("2.0.1", "rightLeftLeft");
+                    private MyEntry<String, String> rightLeftRight = new MyEntry<>("2.1.1", "rightLeftRight");
+                    private MyEntry<String, String> rightRightLeft = new MyEntry<>("3.0.1", "rightRightLeft");
+                    private MyEntry<String, String> rightRightRight = new MyEntry<>("3.1.1", "rightRightRight");
+
+                    @Before
+                    public void setUp() {
+                        List<MyEntry<String, String>> children =
+                                Arrays.asList(
+                                        leftLeftLeft, leftLeftRight, leftRightLeft, leftRightRight,
+                                        rightLeftLeft, rightLeftRight, rightRightLeft, rightRightRight);
+
+                        for (MyEntry<String, String> child : children)
+                            entry.insert(child);
+                    }
+
+                    @Test
+                    public void removeRight() {
+                        // REMOVE "3": expected
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     ___2.1.1___
+                        //          /           \                   /           \
+                        //       0.1             1.1             2.1             3.1
+                        //      /   \           /   \           /               /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1           3.0.1   3.1.1
+                        assertSame(rightLeftRight, right.remove());
+
+                        assertEntryIsAlone(right);
+                        assertSame(entry, rightLeftRight.getParent());
+                        assertSame(rightLeftRight, entry.getRight());
+                        assertSame(rightLeft, rightLeftRight.getLeft());
+                        assertSame(rightLeftRight, rightLeft.getParent());
+                        assertSame(rightLeftRight, rightRight.getParent());
+                        assertSame(rightRight, rightLeftRight.getRight());
+                        assertNull(rightLeft.getRight());
+                    }
                 }
             }
         }

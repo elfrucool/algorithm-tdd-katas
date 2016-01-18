@@ -18,6 +18,16 @@ public class MyEntry<K extends Comparable<K>, V> {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "MyEntry{" +
+                "key=" + key + "," +
+                "value=" + value + "," +
+                "left=" + (left != null ? left : null) + "," +
+                "right=" + (right != null ? right : null) +
+                '}';
+    }
+
     public void setKey(K key) {
         this.key = key;
     }
@@ -166,8 +176,13 @@ public class MyEntry<K extends Comparable<K>, V> {
 
         if (replacement != null) {
             replacement.remove();
+
+            if (parent != null)
+                parent.insert(replacement);
+
             replacement.insert(left);
             replacement.insert(right);
+
             return replacement;
         }
 
