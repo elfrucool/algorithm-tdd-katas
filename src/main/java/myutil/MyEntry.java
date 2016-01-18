@@ -166,16 +166,15 @@ public class MyEntry<K extends Comparable<K>, V> {
     }
 
     public MyEntry<K, V> remove() {
-        ChildType childType = getChildType();
 
         MyEntry<K, V> replacement = getReplacementAfterRemove();
 
-        MyEntry<K, V> parent = removeFromParent(childType);
+        MyEntry<K, V> parent = removeFromParent();
         MyEntry<K, V> left = removeLeft();
         MyEntry<K, V> right = removeRight();
 
         if (replacement != null) {
-            replacement.remove();
+            replacement.removeFromParent();
 
             if (parent != null)
                 parent.insert(replacement);
@@ -193,7 +192,9 @@ public class MyEntry<K extends Comparable<K>, V> {
         return left != null ? left.getBiggest() : right != null ? right : null;
     }
 
-    private MyEntry<K, V> removeFromParent(ChildType childType) {
+    private MyEntry<K, V> removeFromParent() {
+        ChildType childType = getChildType();
+
         MyEntry<K, V> parent = this.parent;
 
         if (childType == ChildType.LEFT)

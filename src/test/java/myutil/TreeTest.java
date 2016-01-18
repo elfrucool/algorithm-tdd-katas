@@ -514,6 +514,28 @@ public class TreeTest {
                         assertSame(rightRight, rightLeftRight.getRight());
                         assertNull(rightLeft.getRight());
                     }
+
+                    @Test
+                    public void removeRightLeftAfterRemoveRight() {
+                        // REMOVE "3"=then=>"2.1.1":expected
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     ____2.1____
+                        //          /           \                   /           \
+                        //       0.1             1.1            2.0.1            3.1
+                        //      /   \           /   \                           /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1                   3.0.1   3.1.1
+                        right.remove();
+
+                        assertSame(rightLeft, rightLeftRight.remove());
+
+                        assertEntryIsAlone(rightLeftRight);
+                        assertHasNoChildren(rightLeftLeft);
+                        assertSame(entry, rightLeft.getParent());
+                        assertSame(rightLeft, entry.getRight());
+                        assertSame(rightLeftLeft, rightLeft.getLeft());
+                        assertSame(rightRight, rightLeft.getRight());
+                    }
                 }
             }
         }
