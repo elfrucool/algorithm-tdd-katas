@@ -69,7 +69,9 @@ public class MyEntry<K extends Comparable<K>, V> {
     public MyEntry<K, V> removeLeft() {
         MyEntry<K, V> left = this.left;
 
-        left.setParent(null);
+        if (left != null)
+            left.setParent(null);
+
         this.left = null;
 
         return left;
@@ -78,7 +80,9 @@ public class MyEntry<K extends Comparable<K>, V> {
     public MyEntry<K, V> removeRight() {
         MyEntry<K, V> right = this.right;
 
-        right.setParent(null);
+        if (right != null)
+            right.setParent(null);
+
         this.right = null;
 
         return right;
@@ -146,31 +150,20 @@ public class MyEntry<K extends Comparable<K>, V> {
     }
 
     public MyEntry<K, V> remove() {
+        MyEntry<K, V> replacement = getReplacementAfterRemove();
+
         MyEntry<K, V> parent = removeFromParent();
+        MyEntry<K, V> left = removeLeft();
+        MyEntry<K, V> right = removeRight();
 
-        MyEntry<K, V> root = getInPlaceNodeAfterRemove(parent);
-
-        if (left != null) {
+        if (left != null)
             left.insert(right);
-            removeLeft();
-        }
 
-        if (right != null)
-            removeRight();
-
-        return root;
+        return replacement != null ? replacement : parent;
     }
 
-    private MyEntry<K, V> getInPlaceNodeAfterRemove(MyEntry<K, V> parent) {
-        MyEntry<K, V> replacement = null;
-        if (parent != null)
-            replacement = parent;
-        else if (left != null) {
-            replacement = left;
-        } else if (right != null){
-            replacement = right;
-        }
-        return replacement;
+    private MyEntry<K, V> getReplacementAfterRemove() {
+        return left != null ? left : right != null ? right : null;
     }
 
     private MyEntry<K, V> removeFromParent() {

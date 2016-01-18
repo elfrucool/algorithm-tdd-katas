@@ -374,10 +374,10 @@ public class TreeTest {
 
                 @Test
                 public void removingRoot() {
-                    assertSame(leftRight, entry.remove());
+                    assertSame(left, entry.remove());
                     assertEntryIsAlone(entry);
-                    assertNull(leftRight.getParent());
-                    assertNull(left.getRight());
+                    assertNull(left.getParent());
+                    assertSame(left.getRight(), right.getParent());
                 }
             }
         }
