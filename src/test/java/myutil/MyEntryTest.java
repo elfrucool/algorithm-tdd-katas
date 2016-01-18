@@ -5,8 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -105,7 +104,7 @@ public class MyEntryTest {
     public class SingleOperationsWithoutSorting {
         @Before
         public void setUp() {
-            assignPropertiesUsingSetters(entry, "2", "two", NULL_PARENT);
+            entry = new MyEntry<>("2", "two");
         }
 
         @Test
@@ -171,14 +170,14 @@ public class MyEntryTest {
 
         @Before
         public void setUp() {
-            assignPropertiesUsingSetters(entry, "2", "two", NULL_PARENT);
+            entry = new MyEntry<>("2", "center");
         }
 
         public class GivenEntryWithoutChildren {
             @Test
             public void insertNullIgnoresResult() {
                 entry.insert(null);
-                assertEntryHasProperties(entry, "2", "two", NULL_PARENT);
+                assertEntryHasProperties(entry, "2", "center", NULL_PARENT);
                 assertEntryIsAlone(entry);
             }
 
@@ -618,6 +617,152 @@ public class MyEntryTest {
                         assertEquals("3.1", entry.find("2.1").getRight().getKey());
                     }
                 }
+            }
+        }
+    }
+
+    public class Iteration {
+        @Before
+        public void setUp() {
+            entry = new MyEntry<>("1.0.0.0", "middle-ie-root");
+        }
+
+        public class IteratingAloneEntries {
+            private Iterator<MyEntry<String, String>> iterator;
+
+            @Before
+            public void setUp() {
+                iterator = entry.iterator();
+            }
+
+            @Test
+            public void canIterateOnce() {
+                assertTrue(iterator.hasNext());
+                assertSame(entry, iterator.next());
+                assertFalse(iterator.hasNext());
+            }
+
+            @Test(expected = NoSuchElementException.class)
+            public void cannotIterateMoreThanOnce() {
+                iterator.next();
+                iterator.next();
+            }
+
+            @Test(timeout = 200)
+            public void canUseInForEachLoops() {
+                for (MyEntry<String, String> current : entry)
+                    assertSame(entry, current);
+            }
+        }
+
+        public class SimpleOperations {
+            @Test
+            public void iterationBeginsWithSmallestElement() {
+                //  STRUCTURE:
+                //             ___1.0.0.0___
+                //            /             \
+                //        0.1.0.0          1.1.0.0
+                //       /       \
+                //  0.0.1.0    0.1.1.0
+                entry.insert(new MyEntry<>("0.1.0.0", "left"));
+                entry.insert(new MyEntry<>("1.1.0.0", "right"));
+                entry.insert(new MyEntry<>("0.0.1.0", "leftLeft"));
+                entry.insert(new MyEntry<>("0.1.1.0", "leftRight"));
+
+                assertEquals("0.0.1.0", entry.iterator().next().getKey());
+            }
+        }
+
+        public class IterationCases {
+            private void assertIteration(String... expectedKeys) {
+                List<String> actualKeys = new ArrayList<>();
+
+                for (MyEntry<String, String> current : entry)
+                    actualKeys.add(current.getKey());
+
+                System.out.println("entry: " + entry);
+                assertEquals(Arrays.asList(expectedKeys), actualKeys);
+            }
+
+            @Test(timeout = 200)
+            public void entryHasOnlyLeftChild() {
+                entry.insert(new MyEntry<>("0.1.0.0", "left"));
+                assertIteration("0.1.0.0", "1.0.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void treeIsComposedByOnlyLeftChildEntries() {
+                // creating not balanced tree using low level methods
+                //           ___1.0.0.0
+                //          /
+                //      0.1.0.0
+                //      /
+                //  0.0.1.0
+                MyEntry<String, String> child = new MyEntry<>("0.1.0.0", "child");
+                child.insert(new MyEntry<>("0.0.1.0", "grand child"));
+                entry.insertLeft(child);
+
+                assertIteration("0.0.1.0", "0.1.0.0", "1.0.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void entryHasOnlyRightChild() {
+                entry.insert(new MyEntry<>("1.1.0.0", "right"));
+
+                assertIteration("1.0.0.0", "1.1.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void entryHasLeftAndRightChildren() {
+                entry.insert(new MyEntry<>("0.1.0.0", "left"));
+                entry.insert(new MyEntry<>("1.1.0.0", "right"));
+
+                assertIteration("0.1.0.0", "1.0.0.0", "1.1.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void treeIsComposedByOnlyRightChildEntries() {
+                // creating not balanced tree using low level methods
+                //  1.0.0.0___
+                //            \
+                //          1.1.0.0
+                //                \
+                //              1.1.1.0
+                MyEntry<String, String> child = new MyEntry<>("1.1.0.0", "child");
+                child.insert(new MyEntry<>("1.1.1.0", "grand child"));
+                entry.insertRight(child);
+
+                assertIteration("1.0.0.0", "1.1.0.0", "1.1.1.0");
+            }
+
+            @Test(timeout = 200)
+            public void rootWithRightNodeWithLeftNode() {
+                // creating not balanced tree using low level methods
+                //  1.0.0.0___
+                //            \
+                //          1.1.0.0
+                //          /
+                //      1.0.1.0
+                MyEntry<String, String> child = new MyEntry<>("1.1.0.0", "child");
+                child.insert(new MyEntry<>("1.0.1.0", "grand child"));
+                entry.insertRight(child);
+
+                assertIteration("1.0.0.0", "1.0.1.0", "1.1.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void rootWithLeftNodeWithRightNode() {
+                // creating not balanced tree using low level methods
+                //           ___1.0.0.0
+                //          /
+                //      0.1.0.0
+                //            \
+                //          0.1.1.0
+                MyEntry<String, String> child = new MyEntry<>("0.1.0.0", "child");
+                child.insert(new MyEntry<>("0.1.1.0", "grand child"));
+                entry.insertLeft(child);
+
+                assertIteration("0.1.0.0", "0.1.1.0", "1.0.0.0");
             }
         }
     }

@@ -1,6 +1,9 @@
 package myutil;
 
-public class MyEntry<K extends Comparable<K>, V> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, V>> {
     public enum ChildType {LEFT, RIGHT, NONE}
 
     private K key;
@@ -101,6 +104,10 @@ public class MyEntry<K extends Comparable<K>, V> {
     }
 
     public void insert(MyEntry<K, V> entry) {
+        insertWithoutRebalancing(entry);
+    }
+
+    protected void insertWithoutRebalancing(MyEntry<K, V> entry) {
         if (entry == null || this == entry)
             return;
 
@@ -184,7 +191,7 @@ public class MyEntry<K extends Comparable<K>, V> {
         if (replacement != null) {
             if (parent != null)
                 parent.insert(replacement);
-            
+
             replacement.insert(left);
             replacement.insert(right);
 
@@ -212,5 +219,45 @@ public class MyEntry<K extends Comparable<K>, V> {
             parent.removeRight();
 
         return parent;
+    }
+
+    @Override
+    public Iterator<MyEntry<K, V>> iterator() {
+        return new MyEntryIterator();
+    }
+
+    private class MyEntryIterator implements Iterator<MyEntry<K, V>> {
+        private boolean isEnd = false;
+        private MyEntry<K, V> cursor = MyEntry.this.getSmallest();
+
+        @Override
+        public boolean hasNext() {
+            return !isEnd;
+        }
+
+        @Override
+        public MyEntry<K, V> next() {
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            MyEntry<K, V> actual = cursor;
+
+            cursor = getSuccessor(cursor);
+            isEnd = cursor == null;
+            return actual;
+        }
+
+        private MyEntry<K, V> getSuccessor(MyEntry<K, V> cursor) {
+            if (cursor.getRight() != null)
+                return cursor.getRight().getSmallest();
+
+            if (ChildType.RIGHT != cursor.getChildType())
+                return cursor.getParent();
+
+            if (cursor.getParent() != null && cursor.getParent().getChildType() == ChildType.LEFT)
+                return cursor.getParent().getParent();
+
+            return  null;
+        }
     }
 }
