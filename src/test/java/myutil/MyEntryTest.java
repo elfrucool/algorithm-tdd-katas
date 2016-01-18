@@ -506,7 +506,23 @@ public class MyEntryTest {
 
                     @Test
                     public void removeRight() {
-                        // REMOVE "3": expected
+                        // FROM:
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     _____3_____
+                        //          /           \                   /           \
+                        //       0.1             1.1             2.1             3.1
+                        //      /   \           /   \           /   \           /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1   2.1.1   3.0.1   3.1.1
+                        //
+                        //                              |   |
+                        //                              |   |
+                        //                             \|   |/
+                        //                              \   /
+                        //                               \ /
+                        //                                v
+                        // TO:
+                        // REMOVE "3": expected structore
                         //                  ______________2______________
                         //                 /                             \
                         //           _____1_____                     ___2.1.1___
@@ -528,7 +544,23 @@ public class MyEntryTest {
 
                     @Test
                     public void removeRightLeftAfterRemoveRight() {
-                        // REMOVE "3"=then=>"2.1.1":expected
+                        // FROM:
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     ___2.1.1___
+                        //          /           \                   /           \
+                        //       0.1             1.1             2.1             3.1
+                        //      /   \           /   \           /               /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1           3.0.1   3.1.1
+                        //
+                        //                              |   |
+                        //                              |   |
+                        //                             \|   |/
+                        //                              \   /
+                        //                               \ /
+                        //                                v
+                        // TO:
+                        // REMOVE "3"=then=>"2.1.1":expected structure
                         //                  ______________2______________
                         //                 /                             \
                         //           _____1_____                     ____2.1____
@@ -550,7 +582,23 @@ public class MyEntryTest {
 
                     @Test
                     public void whenReceivingKeyRemoveFirstSearchForKeyAndThenRemoves() {
-                        // REMOVE "3"=then=>"2.1.1":expected structure
+                        // FROM:
+                        //                  ______________2______________
+                        //                 /                             \
+                        //           _____1_____                     ___2.1.1___
+                        //          /           \                   /           \
+                        //       0.1             1.1             2.1             3.1
+                        //      /   \           /   \           /               /   \
+                        //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1           3.0.1   3.1.1
+                        //
+                        //                              |   |
+                        //                              |   |
+                        //                             \|   |/
+                        //                              \   /
+                        //                               \ /
+                        //                                v
+                        // TO:
+                        // REMOVE "3"=then=>"2.1.1" (using key): expected structure
                         //                  ______________2______________
                         //                 /                             \
                         //           _____1_____                     ____2.1____
