@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 // 2. iterable/iterator: traversing
 // 3. balancing
 @RunWith(HierarchicalContextRunner.class)
-public class TreeTest {
+public class MyEntryTest {
     private <K extends Comparable<K>, V> void assignPropertiesUsingSetters(
             MyEntry<K, V> entry, K key, V value, MyEntry<K, V> parent) //
     {
