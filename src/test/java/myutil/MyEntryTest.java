@@ -2,6 +2,7 @@ package myutil;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -698,9 +699,8 @@ public class MyEntryTest {
                 //      0.1.0.0
                 //      /
                 //  0.0.1.0
-                MyEntry<String, String> child = new MyEntry<>("0.1.0.0", "child");
-                child.insert(new MyEntry<>("0.0.1.0", "grand child"));
-                entry.insertLeft(child);
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.0.1.0", "grand child"));
 
                 assertIteration("0.0.1.0", "0.1.0.0", "1.0.0.0");
             }
@@ -728,9 +728,8 @@ public class MyEntryTest {
                 //          1.1.0.0
                 //                \
                 //              1.1.1.0
-                MyEntry<String, String> child = new MyEntry<>("1.1.0.0", "child");
-                child.insert(new MyEntry<>("1.1.1.0", "grand child"));
-                entry.insertRight(child);
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.0.0", "child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.1.0", "grand child"));
 
                 assertIteration("1.0.0.0", "1.1.0.0", "1.1.1.0");
             }
@@ -743,9 +742,8 @@ public class MyEntryTest {
                 //          1.1.0.0
                 //          /
                 //      1.0.1.0
-                MyEntry<String, String> child = new MyEntry<>("1.1.0.0", "child");
-                child.insert(new MyEntry<>("1.0.1.0", "grand child"));
-                entry.insertRight(child);
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.0.0", "child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("1.0.1.0", "grand child"));
 
                 assertIteration("1.0.0.0", "1.0.1.0", "1.1.0.0");
             }
@@ -758,11 +756,50 @@ public class MyEntryTest {
                 //      0.1.0.0
                 //            \
                 //          0.1.1.0
-                MyEntry<String, String> child = new MyEntry<>("0.1.0.0", "child");
-                child.insert(new MyEntry<>("0.1.1.0", "grand child"));
-                entry.insertLeft(child);
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.1.0", "grand child"));
 
                 assertIteration("0.1.0.0", "0.1.1.0", "1.0.0.0");
+            }
+
+            @Test(timeout = 200)
+            public void rootWithLeftNodeWithTwoCainedRightNodes() {
+                // creating not balanced tree using low level methods
+                //           ___1.0.0.0
+                //          /
+                //      0.1.0.0
+                //            \
+                //          0.1.1.0
+                //              \
+                //            0.1.1.1
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.1.0", "grand child"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.1.1", "grand grand child"));
+
+                assertIteration("0.1.0.0", "0.1.1.0", "0.1.1.1", "1.0.0.0");
+            }
+
+            @Test
+            public void completeTree() {
+                // A FULL TREE:
+                //
+                //                       __________1.0.0.0__________
+                //                      /                           \
+                //              _0.1.0.0_                           _1.1.0.0_
+                //             /         \                         /         \
+                //      0.0.1.0           0.1.1.0           1.0.1.0           1.1.1.0
+                //       /   \             /   \             /   \             /   \
+                //  0.0.0.1 0.0.1.1   0.1.0.1 0.1.1.1   1.0.0.1 1.0.1.1   1.1.0.1 1.1.1.1
+                String[] keysToInsert = { // insertion order reflects the desired structure
+                        "0.1.0.0", "1.1.0.0", "0.0.1.0", "0.1.1.0", "1.0.1.0", "1.1.1.0", //
+                        "0.0.0.1", "0.0.1.1", "0.1.0.1", "0.1.1.1", "1.0.0.1", "1.0.1.1", "1.1.0.1", "1.1.1.1"};
+
+                for (String key : keysToInsert)
+                    entry.insertWithoutRebalancing(new MyEntry<>(key, "whatever"));
+
+                assertIteration( //
+                        "0.0.0.1", "0.0.1.0", "0.0.1.1", "0.1.0.0", "0.1.0.1", "0.1.1.0", "0.1.1.1", //
+                        "1.0.0.0", "1.0.0.1", "1.0.1.0", "1.0.1.1", "1.1.0.0", "1.1.0.1", "1.1.1.0", "1.1.1.1");
             }
         }
     }

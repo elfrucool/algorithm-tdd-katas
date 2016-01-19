@@ -221,18 +221,32 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
         return parent;
     }
 
+    private MyEntry<K, V> getSuccessor() {
+        MyEntry<K, V> cursor = this;
+
+        if (cursor.getRight() != null)
+            return cursor.getRight().getSmallest();
+
+        if (cursor.getChildType() != ChildType.RIGHT)
+            return cursor.getParent();
+
+        while (cursor.getChildType() == ChildType.RIGHT)
+            cursor = cursor.getParent();
+
+        return cursor.getParent();
+    }
+
     @Override
     public Iterator<MyEntry<K, V>> iterator() {
         return new MyEntryIterator();
     }
 
     private class MyEntryIterator implements Iterator<MyEntry<K, V>> {
-        private boolean isEnd = false;
         private MyEntry<K, V> cursor = MyEntry.this.getSmallest();
 
         @Override
         public boolean hasNext() {
-            return !isEnd;
+            return cursor != null;
         }
 
         @Override
@@ -241,23 +255,10 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
                 throw new NoSuchElementException();
 
             MyEntry<K, V> actual = cursor;
+            cursor = cursor.getSuccessor();
 
-            cursor = getSuccessor(cursor);
-            isEnd = cursor == null;
             return actual;
         }
 
-        private MyEntry<K, V> getSuccessor(MyEntry<K, V> cursor) {
-            if (cursor.getRight() != null)
-                return cursor.getRight().getSmallest();
-
-            if (ChildType.RIGHT != cursor.getChildType())
-                return cursor.getParent();
-
-            if (cursor.getParent() != null && cursor.getParent().getChildType() == ChildType.LEFT)
-                return cursor.getParent().getParent();
-
-            return  null;
-        }
     }
 }
