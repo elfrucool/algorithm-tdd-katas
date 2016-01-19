@@ -2,7 +2,6 @@ package myutil;
 
 import de.bechte.junit.runners.context.HierarchicalContextRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -12,15 +11,15 @@ import static org.junit.Assert.*;
 
 // PLAN
 // ====
-// 0. does not allow repetitions
-// 1. node with basic operations:
+// [ok] 0. does not allow repetitions
+// [ok] 1. node with basic operations:
 //      [ok] - insert
 //      [ok] - remove
 //      [ok] - find
 //      [ok] - getSmallest
 //      [ok] - getBiggest
 //      [ok] - getRoot
-// 2. iterable/iterator: traversing
+// [ok] 2. iterable/iterator: traversing
 // 3. balancing
 @RunWith(HierarchicalContextRunner.class)
 public class MyEntryTest {
