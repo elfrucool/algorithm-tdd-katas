@@ -49,6 +49,20 @@ public class MyEntryTest {
         assertNull(entry.getRight());
     }
 
+    protected static <K extends Comparable<K>, V> void assertEntryHasLeft(
+            MyEntry<K, V> entry, MyEntry<K, V> left) //
+    {
+        assertSame(left, entry.getLeft());
+        assertSame(entry, left.getParent());
+    }
+
+    protected static <K extends Comparable<K>, V> void assertEntryHasRight(
+            MyEntry<K, V> entry, MyEntry<K, V> right) //
+    {
+        assertSame(right, entry.getRight());
+        assertSame(entry, right.getParent());
+    }
+
     private static <K extends Comparable<K>, V> void assertDeleteSingleChild(
             MyEntry<K, V> entry, MyEntry<K, V> expectedReplacement) //
     {
@@ -111,18 +125,14 @@ public class MyEntryTest {
         public void canInsertLeft() {
             MyEntry<String, String> left = new MyEntry<>("1", "one");
             entry.insertLeft(left);
-
-            assertSame(left, entry.getLeft());
-            assertSame(entry, left.getParent());
+            assertEntryHasLeft(entry, left);
         }
 
         @Test
         public void canInsertRight() {
             MyEntry<String, String> right = new MyEntry<>("3", "three");
             entry.insertRight(right);
-
-            assertSame(right, entry.getRight());
-            assertSame(entry, right.getParent());
+            assertEntryHasRight(entry, right);
         }
 
         @Test
@@ -196,18 +206,14 @@ public class MyEntryTest {
             public void canInsertLeftSmallerKeyEntries() {
                 MyEntry<String, String> shouldBeLeft = new MyEntry<>("1", "left");
                 entry.insert(shouldBeLeft);
-
-                assertSame(shouldBeLeft, entry.getLeft());
-                assertSame(entry, shouldBeLeft.getParent());
+                assertEntryHasLeft(entry, shouldBeLeft);
             }
 
             @Test
             public void canInsertRightBiggerKeyEntries() {
                 MyEntry<String, String> shouldBeRight = new MyEntry<>("3", "right");
                 entry.insert(shouldBeRight);
-
-                assertSame(shouldBeRight, entry.getRight());
-                assertSame(entry, shouldBeRight.getParent());
+                assertEntryHasRight(entry, shouldBeRight);
             }
         }
 
@@ -221,18 +227,14 @@ public class MyEntryTest {
             public void canInsertInLeftSmallerKeyEntries() {
                 MyEntry<String, String> shouldBeLeft = new MyEntry<>("0.1", "left-left");
                 entry.insert(shouldBeLeft);
-
-                assertSame(shouldBeLeft, entry.getLeft().getLeft());
-                assertSame(entry.getLeft(), shouldBeLeft.getParent());
+                assertEntryHasLeft(entry.getLeft(), shouldBeLeft);
             }
 
             @Test
             public void canInsertInRightBiggerKeyEntries() {
                 MyEntry<String, String> shouldBeRight = new MyEntry<>("3.1", "right-right");
                 entry.insert(shouldBeRight);
-
-                assertSame(shouldBeRight, entry.getRight().getRight());
-                assertSame(entry.getRight(), shouldBeRight.getParent());
+                assertEntryHasRight(entry.getRight(), shouldBeRight);
             }
 
             @Test
@@ -243,11 +245,8 @@ public class MyEntryTest {
                 entry.insert(leftRight);
                 entry.insert(rightLeft);
 
-                assertSame(leftRight, entry.getLeft().getRight());
-                assertSame(entry.getLeft(), leftRight.getParent());
-
-                assertSame(rightLeft, entry.getRight().getLeft());
-                assertSame(entry.getRight(), rightLeft.getParent());
+                assertEntryHasRight(entry.getLeft(), leftRight);
+                assertEntryHasLeft(entry.getRight(), rightLeft);
             }
         }
 
@@ -534,8 +533,7 @@ public class MyEntryTest {
                         assertEntryIsAlone(right);
                         assertSame(entry, k211RightLeftRight.getParent());
                         assertSame(k211RightLeftRight, entry.getRight());
-                        assertSame(k21RightLeft, k211RightLeftRight.getLeft());
-                        assertSame(k211RightLeftRight, k21RightLeft.getParent());
+                        assertEntryHasLeft(k211RightLeftRight, k21RightLeft);
                         assertSame(k211RightLeftRight, k31RightRight.getParent());
                         assertSame(k31RightRight, k211RightLeftRight.getRight());
                         assertNull(k21RightLeft.getRight());
@@ -573,8 +571,9 @@ public class MyEntryTest {
 
                         assertEntryIsAlone(k211RightLeftRight);
                         assertHasNoChildren(k201RightLeftLeft);
-                        assertSame(entry, k21RightLeft.getParent());
-                        assertSame(k21RightLeft, entry.getRight());
+
+                        assertEntryHasRight(entry, k21RightLeft);
+
                         assertSame(k201RightLeftLeft, k21RightLeft.getLeft());
                         assertSame(k31RightRight, k21RightLeft.getRight());
                     }
@@ -680,7 +679,6 @@ public class MyEntryTest {
                 for (MyEntry<String, String> current : entry)
                     actualKeys.add(current.getKey());
 
-                System.out.println("entry: " + entry);
                 assertEquals(Arrays.asList(expectedKeys), actualKeys);
             }
 
