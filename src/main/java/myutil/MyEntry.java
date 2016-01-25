@@ -234,7 +234,24 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
             if (grandParent != null)
                 grandParent.insertWithoutRebalancing(this);
             insertWithoutRebalancing(parent);
-            insertWithoutRebalancing(left);
+            parent.insertWithoutRebalancing(left);
+        }
+    }
+
+    public void rotateRight() {
+        if (getChildType() == ChildType.LEFT) {
+            MyEntry<K, V> parent = getParent();
+            MyEntry<K, V> right = getRight();
+            MyEntry<K, V> grandParent = parent.getParent();
+
+            removeRight();
+            parent.removeLeft();
+            parent.removeFromParent();
+
+            if (grandParent != null)
+                grandParent.insertWithoutRebalancing(this);
+            insertWithoutRebalancing(parent);
+            parent.insertWithoutRebalancing(right);
         }
     }
 
