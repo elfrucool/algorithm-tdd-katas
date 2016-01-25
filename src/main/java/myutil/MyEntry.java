@@ -221,6 +221,23 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
         return parent;
     }
 
+    public void rotateLeft() {
+        if (getChildType() == ChildType.RIGHT) {
+            MyEntry<K, V> parent = getParent();
+            MyEntry<K, V> left = getLeft();
+            MyEntry<K, V> grandParent = parent.getParent();
+
+            removeLeft();
+            parent.removeRight();
+            parent.removeFromParent();
+
+            if (grandParent != null)
+                grandParent.insertWithoutRebalancing(this);
+            insertWithoutRebalancing(parent);
+            insertWithoutRebalancing(left);
+        }
+    }
+
     private MyEntry<K, V> getSuccessor() {
         MyEntry<K, V> cursor = this;
 
