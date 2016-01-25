@@ -222,37 +222,25 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
     }
 
     public void rotateLeft() {
-        if (getChildType() == ChildType.RIGHT) {
-            MyEntry<K, V> parent = getParent();
-            MyEntry<K, V> left = getLeft();
-            MyEntry<K, V> grandParent = parent.getParent();
-
-            removeLeft();
-            parent.removeRight();
-            parent.removeFromParent();
-
-            if (grandParent != null)
-                grandParent.insertWithoutRebalancing(this);
-            insertWithoutRebalancing(parent);
-            parent.insertWithoutRebalancing(left);
-        }
+        if (getChildType() == ChildType.RIGHT)
+            rotate(getParent(), getLeft(), getParent().getParent());
     }
 
     public void rotateRight() {
-        if (getChildType() == ChildType.LEFT) {
-            MyEntry<K, V> parent = getParent();
-            MyEntry<K, V> right = getRight();
-            MyEntry<K, V> grandParent = parent.getParent();
+        if (getChildType() == ChildType.LEFT)
+            rotate(getParent(), getRight(), getParent().getParent());
+    }
 
-            removeRight();
-            parent.removeLeft();
-            parent.removeFromParent();
+    protected void rotate(MyEntry<K, V> parent, MyEntry<K, V> child, MyEntry<K, V> grandParent) {
+        if (child != null)
+            child.removeFromParent();
+        removeFromParent();
+        parent.removeFromParent();
 
-            if (grandParent != null)
-                grandParent.insertWithoutRebalancing(this);
-            insertWithoutRebalancing(parent);
-            parent.insertWithoutRebalancing(right);
-        }
+        if (grandParent != null)
+            grandParent.insertWithoutRebalancing(this);
+        insertWithoutRebalancing(parent);
+        parent.insertWithoutRebalancing(child);
     }
 
     private MyEntry<K, V> getSuccessor() {
