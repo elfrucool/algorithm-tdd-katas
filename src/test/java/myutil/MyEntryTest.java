@@ -163,9 +163,9 @@ public class MyEntryTest {
             entry.insertLeft(left);
             entry.insertRight(right);
 
-            assertEquals(MyEntry.ChildType.NONE, entry.getChildType());
-            assertEquals(MyEntry.ChildType.LEFT, left.getChildType());
-            assertEquals(MyEntry.ChildType.RIGHT, right.getChildType());
+            assertEquals(MyEntry.NONE, entry.getChildType());
+            assertEquals(MyEntry.LEFT, left.getChildType());
+            assertEquals(MyEntry.RIGHT, right.getChildType());
         }
     }
 

@@ -4,7 +4,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, V>> {
-    public enum ChildType {LEFT, RIGHT, NONE}
+    private enum ChildType {LEFT, RIGHT, NONE}
+
+    public static final ChildType NONE = ChildType.NONE;
+    public static final ChildType LEFT = ChildType.LEFT;
+    public static final ChildType RIGHT = ChildType.RIGHT;
 
     private K key;
     private V value;
@@ -174,7 +178,7 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
     }
 
     public ChildType getChildType() {
-        return parent == null ? ChildType.NONE : parent.getLeft() == this ? ChildType.LEFT : ChildType.RIGHT;
+        return parent == null ? NONE : parent.getLeft() == this ? LEFT : RIGHT;
     }
 
     public MyEntry<K, V> remove(K key) {
@@ -213,21 +217,21 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
 
         MyEntry<K, V> parent = this.parent;
 
-        if (childType == ChildType.LEFT)
+        if (childType == LEFT)
             parent.removeLeft();
-        else if (childType == ChildType.RIGHT)
+        else if (childType == RIGHT)
             parent.removeRight();
 
         return parent;
     }
 
     public void rotateLeft() {
-        if (getChildType() == ChildType.RIGHT)
+        if (getChildType() == RIGHT)
             rotate(getParent(), getLeft(), getParent().getParent());
     }
 
     public void rotateRight() {
-        if (getChildType() == ChildType.LEFT)
+        if (getChildType() == LEFT)
             rotate(getParent(), getRight(), getParent().getParent());
     }
 
@@ -249,10 +253,10 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
         if (cursor.getRight() != null)
             return cursor.getRight().getSmallest();
 
-        if (cursor.getChildType() != ChildType.RIGHT)
+        if (cursor.getChildType() != RIGHT)
             return cursor.getParent();
 
-        while (cursor.getChildType() == ChildType.RIGHT)
+        while (cursor.getChildType() == RIGHT)
             cursor = cursor.getParent();
 
         return cursor.getParent();
