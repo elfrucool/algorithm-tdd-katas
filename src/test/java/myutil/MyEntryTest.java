@@ -66,7 +66,7 @@ public class MyEntryTest {
     private static <K extends Comparable<K>, V> void assertDeleteSingleChild(
             MyEntry<K, V> entry, MyEntry<K, V> expectedReplacement) //
     {
-        assertSame(expectedReplacement, entry.remove());
+        assertSame(expectedReplacement, entry.removeWithoutRebalancing());
         assertEntryIsAlone(entry);
         assertNull(expectedReplacement.getParent());
     }
@@ -186,7 +186,7 @@ public class MyEntryTest {
         public class GivenEntryWithoutChildren {
             @Test
             public void insertNullIgnoresResult() {
-                entry.insert(null);
+                entry.insertWithoutRebalancing(null);
                 assertEntryHasProperties(entry, "2", "center", NULL_PARENT);
                 assertEntryIsAlone(entry);
             }
@@ -195,7 +195,7 @@ public class MyEntryTest {
             public void insertingEntryWithSameKeyUpdatesValue() {
                 MyEntry<String, String> shouldBeSame = new MyEntry<>("2", "should be same");
 
-                entry.insert(shouldBeSame);
+                entry.insertWithoutRebalancing(shouldBeSame);
 
                 assertEquals("should be same", entry.getValue());
                 assertEntryIsAlone(entry);
@@ -205,14 +205,14 @@ public class MyEntryTest {
             @Test
             public void canInsertLeftSmallerKeyEntries() {
                 MyEntry<String, String> shouldBeLeft = new MyEntry<>("1", "left");
-                entry.insert(shouldBeLeft);
+                entry.insertWithoutRebalancing(shouldBeLeft);
                 assertEntryHasLeft(entry, shouldBeLeft);
             }
 
             @Test
             public void canInsertRightBiggerKeyEntries() {
                 MyEntry<String, String> shouldBeRight = new MyEntry<>("3", "right");
-                entry.insert(shouldBeRight);
+                entry.insertWithoutRebalancing(shouldBeRight);
                 assertEntryHasRight(entry, shouldBeRight);
             }
         }
@@ -226,14 +226,14 @@ public class MyEntryTest {
             @Test
             public void canInsertInLeftSmallerKeyEntries() {
                 MyEntry<String, String> shouldBeLeft = new MyEntry<>("0.1", "left-left");
-                entry.insert(shouldBeLeft);
+                entry.insertWithoutRebalancing(shouldBeLeft);
                 assertEntryHasLeft(entry.getLeft(), shouldBeLeft);
             }
 
             @Test
             public void canInsertInRightBiggerKeyEntries() {
                 MyEntry<String, String> shouldBeRight = new MyEntry<>("3.1", "right-right");
-                entry.insert(shouldBeRight);
+                entry.insertWithoutRebalancing(shouldBeRight);
                 assertEntryHasRight(entry.getRight(), shouldBeRight);
             }
 
@@ -242,8 +242,8 @@ public class MyEntryTest {
                 MyEntry<String, String> leftRight = new MyEntry<>("1.1", "left-right");
                 MyEntry<String, String> rightLeft = new MyEntry<>("2.1", "right-left");
 
-                entry.insert(leftRight);
-                entry.insert(rightLeft);
+                entry.insertWithoutRebalancing(leftRight);
+                entry.insertWithoutRebalancing(rightLeft);
 
                 assertEntryHasRight(entry.getLeft(), leftRight);
                 assertEntryHasLeft(entry.getRight(), rightLeft);
@@ -256,8 +256,8 @@ public class MyEntryTest {
                 MyEntry<String, String> updatedLeft = new MyEntry<>("0.0", "new smallest is updated left");
                 MyEntry<String, String> updatedRight = new MyEntry<>("4", "new biggest is updated right");
 
-                updatedEntry.insert(updatedLeft);
-                updatedEntry.insert(updatedRight);
+                updatedEntry.insertWithoutRebalancing(updatedLeft);
+                updatedEntry.insertWithoutRebalancing(updatedRight);
                 return updatedEntry;
             }
 
@@ -276,7 +276,7 @@ public class MyEntryTest {
                 rightRight = new MyEntry<>("3.1", "right-right");
 
                 for (MyEntry<String, String> e : Arrays.asList(leftLeft, leftRight, rightLeft, rightRight))
-                    entry.insert(e);
+                    entry.insertWithoutRebalancing(e);
             }
 
             @Test
@@ -322,7 +322,7 @@ public class MyEntryTest {
                 MyEntry<String, String> updatedEntry = makeUpdatedEntryWithChildren();
                 MyEntry<String, String> updatedLeft = updatedEntry.getLeft();
 
-                entry.insert(updatedEntry);
+                entry.insertWithoutRebalancing(updatedEntry);
 
                 assertEquals("updated value", entry.getValue());
                 assertEquals("0.0", entry.getSmallest().getKey());
@@ -334,20 +334,20 @@ public class MyEntryTest {
         public class RemoveScenarios {
             @Test
             public void removeAloneEntryReturnsNull() {
-                assertNull(entry.remove());
+                assertNull(entry.removeWithoutRebalancing());
                 assertEntryIsAlone(entry);
             }
 
             public class GivenEntryWithSingleChild {
                 @Test
                 public void ifOnlyLeftIsSetWhenRemovingEntryLeftBecomesNewInPlaceEntry() {
-                    entry.insert(left);
+                    entry.insertWithoutRebalancing(left);
                     assertDeleteSingleChild(entry, left);
                 }
 
                 @Test
                 public void ifOnlyRightIsSetWhenRemovingEntryLeftBecomesNewInPlaceEntry() {
-                    entry.insert(right);
+                    entry.insertWithoutRebalancing(right);
                     assertDeleteSingleChild(entry, right);
                 }
             }
@@ -360,21 +360,21 @@ public class MyEntryTest {
 
                 @Test
                 public void removingLeftLeafMakesItAloneRemovesFromParentAndReturnsNewInPlaceEntry() {
-                    assertSame(entry, left.remove());
+                    assertSame(entry, left.removeWithoutRebalancing());
                     assertEntryIsAlone(left);
                     assertNull(entry.getLeft());
                 }
 
                 @Test
                 public void removingRightLeafMakesItAloneRemovesFromParentAndReturnsNewInPlaceEntry() {
-                    assertSame(entry, right.remove());
+                    assertSame(entry, right.removeWithoutRebalancing());
                     assertEntryIsAlone(right);
                     assertNull(entry.getRight());
                 }
 
                 @Test
                 public void removingRootMakesLeftNewRootAndRightChildOfLeft() {
-                    assertSame(left, entry.remove());
+                    assertSame(left, entry.removeWithoutRebalancing());
                     assertEntryIsAlone(entry);
                     assertSame(right, left.getRight());
                 }
@@ -398,7 +398,7 @@ public class MyEntryTest {
                     addTwoChildrenToRootEntry();
 
                     for (MyEntry<String, String> e : Arrays.asList(k01LeftLeft, k11LeftRight, k21RightLeft, k31RightRight))
-                        entry.insert(e);
+                        entry.insertWithoutRebalancing(e);
                 }
 
                 @Test
@@ -410,7 +410,7 @@ public class MyEntryTest {
                     //    1       3    ======>     1       3
                     //   / \     / \              /       / \
                     // 0.1 1.1 2.1 3.1          0.1     2.1 3.1
-                    assertSame(k11LeftRight, entry.remove());
+                    assertSame(k11LeftRight, entry.removeWithoutRebalancing());
 
                     assertEntryIsAlone(entry);
                     assertNull(k11LeftRight.getParent());
@@ -427,7 +427,7 @@ public class MyEntryTest {
                     //    1       3    ======>    0.1       3
                     //   / \     / \                 \     / \
                     // 0.1 1.1 2.1 3.1              1.1  2.1 3.1
-                    assertSame(k01LeftLeft, left.remove());
+                    assertSame(k01LeftLeft, left.removeWithoutRebalancing());
 
                     assertEntryIsAlone(left);
                     assertSame(entry, k01LeftLeft.getParent());
@@ -444,7 +444,7 @@ public class MyEntryTest {
                     //    1       3    ======>    1      2.1
                     //   / \     / \             / \       \
                     // 0.1 1.1 2.1 3.1         0.1 1.1     3.1
-                    assertSame(k21RightLeft, right.remove());
+                    assertSame(k21RightLeft, right.removeWithoutRebalancing());
 
                     assertEntryIsAlone(right);
                     assertSame(entry, k21RightLeft.getParent());
@@ -461,9 +461,9 @@ public class MyEntryTest {
                     //    1       3    ======>   0.1     2.1
                     //   /       / \                       \
                     // 0.1     2.1 3.1                     3.1
-                    k11LeftRight.remove();
+                    k11LeftRight.removeWithoutRebalancing();
 
-                    assertSame(k01LeftLeft, left.remove());
+                    assertSame(k01LeftLeft, left.removeWithoutRebalancing());
 
                     assertEntryIsAlone(left);
                     assertSame(entry, k01LeftLeft.getParent());
@@ -499,7 +499,7 @@ public class MyEntryTest {
                                         k201RightLeftLeft, k211RightLeftRight, k301ightRightLeft, k311RightRightRight);
 
                         for (MyEntry<String, String> child : children)
-                            entry.insert(child);
+                            entry.insertWithoutRebalancing(child);
                     }
 
                     @Test
@@ -528,7 +528,7 @@ public class MyEntryTest {
                         //       0.1             1.1             2.1             3.1
                         //      /   \           /   \           /               /   \
                         //  0.0.1   0.1.1   1.0.1   1.1.1   2.0.1           3.0.1   3.1.1
-                        assertSame(k211RightLeftRight, right.remove());
+                        assertSame(k211RightLeftRight, right.removeWithoutRebalancing());
 
                         assertEntryIsAlone(right);
                         assertSame(entry, k211RightLeftRight.getParent());
@@ -565,9 +565,9 @@ public class MyEntryTest {
                         //       0.1             1.1            2.0.1            3.1
                         //      /   \           /   \                           /   \
                         //  0.0.1   0.1.1   1.0.1   1.1.1                   3.0.1   3.1.1
-                        right.remove();
+                        right.removeWithoutRebalancing();
 
-                        assertSame(k21RightLeft, k211RightLeftRight.remove());
+                        assertSame(k21RightLeft, k211RightLeftRight.removeWithoutRebalancing());
 
                         assertEntryIsAlone(k211RightLeftRight);
                         assertHasNoChildren(k201RightLeftLeft);
@@ -604,7 +604,7 @@ public class MyEntryTest {
                         //       0.1             1.1            2.0.1            3.1
                         //      /   \           /   \                           /   \
                         //  0.0.1   0.1.1   1.0.1   1.1.1                   3.0.1   3.1.1
-                        right.remove();
+                        right.removeWithoutRebalancing();
 
                         assertSame("2.1", entry.remove("2.1.1").getKey());
 
@@ -663,10 +663,10 @@ public class MyEntryTest {
                 //        0.1.0.0          1.1.0.0
                 //       /       \
                 //  0.0.1.0    0.1.1.0
-                entry.insert(new MyEntry<>("0.1.0.0", "left"));
-                entry.insert(new MyEntry<>("1.1.0.0", "right"));
-                entry.insert(new MyEntry<>("0.0.1.0", "leftLeft"));
-                entry.insert(new MyEntry<>("0.1.1.0", "leftRight"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "left"));
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.0.0", "right"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.0.1.0", "leftLeft"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.1.0", "leftRight"));
 
                 assertEquals("0.0.1.0", entry.iterator().next().getKey());
             }
@@ -684,7 +684,7 @@ public class MyEntryTest {
 
             @Test(timeout = 200)
             public void entryHasOnlyLeftChild() {
-                entry.insert(new MyEntry<>("0.1.0.0", "left"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "left"));
                 assertIteration("0.1.0.0", "1.0.0.0");
             }
 
@@ -704,15 +704,15 @@ public class MyEntryTest {
 
             @Test(timeout = 200)
             public void entryHasOnlyRightChild() {
-                entry.insert(new MyEntry<>("1.1.0.0", "right"));
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.0.0", "right"));
 
                 assertIteration("1.0.0.0", "1.1.0.0");
             }
 
             @Test(timeout = 200)
             public void entryHasLeftAndRightChildren() {
-                entry.insert(new MyEntry<>("0.1.0.0", "left"));
-                entry.insert(new MyEntry<>("1.1.0.0", "right"));
+                entry.insertWithoutRebalancing(new MyEntry<>("0.1.0.0", "left"));
+                entry.insertWithoutRebalancing(new MyEntry<>("1.1.0.0", "right"));
 
                 assertIteration("0.1.0.0", "1.0.0.0", "1.1.0.0");
             }

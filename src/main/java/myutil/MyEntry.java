@@ -179,10 +179,10 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
 
     public MyEntry<K, V> remove(K key) {
         MyEntry<K, V> found = find(key);
-        return found != null ? found.remove() : null;
+        return found != null ? found.removeWithoutRebalancing() : null;
     }
 
-    public MyEntry<K, V> remove() {
+    public MyEntry<K, V> removeWithoutRebalancing() {
         MyEntry<K, V> replacement = getReplacementAfterRemove();
         MyEntry<K, V> parent = removeFromParent();
         MyEntry<K, V> left = removeLeft();
