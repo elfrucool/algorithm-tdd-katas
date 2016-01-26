@@ -803,132 +803,199 @@ public class MyEntryTest {
         }
     }
 
-    public class Rotation {
+    public class RebalangingOperations {
         @Before
         public void setUp() {
             entry = new MyEntry<>("1.0.0.0", "root");
         }
 
-        public class RotatingLeft {
-            @Test
-            public void singleEntry() {
-                entry.rotateLeft();
-                assertEntryIsAlone(entry);
+        public class Rotation {
+            public class RotatingLeft {
+                @Test
+                public void singleEntry() {
+                    entry.rotateLeft();
+                    assertEntryIsAlone(entry);
+                }
+
+                @Test
+                public void rightEntry() {
+                    MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
+                    entry.insertWithoutRebalancing(right);
+
+                    right.rotateLeft();
+
+                    assertNull(right.getParent());
+                    assertEntryHasLeft(right, entry);
+                    assertHasNoChildren(entry);
+                }
+
+                @Test
+                public void leftEntry() {
+                    MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
+                    entry.insertWithoutRebalancing(left);
+
+                    left.rotateLeft();
+                    assertNull(entry.getParent());
+                    assertEntryHasLeft(entry, left);
+                    assertHasNoChildren(left);
+                }
+
+                @Test
+                public void rightEntryWithLeftChild() {
+                    MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
+                    MyEntry<String, String> rightLeft = new MyEntry<>("1.0.1.0", "rightLeft");
+
+                    entry.insertWithoutRebalancing(right);
+                    entry.insertWithoutRebalancing(rightLeft);
+
+                    right.rotateLeft();
+
+                    assertNull(right.getParent());
+                    assertEntryHasLeft(right, entry);
+                    assertEntryHasRight(entry, rightLeft);
+                }
+
+                @Test
+                public void rightEntryWithGrandParent() {
+                    MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
+                    MyEntry<String, String> rightRight = new MyEntry<>("1.1.1.0", "rightRight");
+
+                    entry.insertWithoutRebalancing(right);
+                    entry.insertWithoutRebalancing(rightRight);
+
+                    rightRight.rotateLeft();
+
+                    assertEntryHasRight(entry, rightRight);
+                    assertEntryHasLeft(rightRight, right);
+                    assertHasNoChildren(right);
+                }
             }
 
-            @Test
-            public void rightEntry() {
-                MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
-                entry.insertWithoutRebalancing(right);
+            public class RotatingRight {
+                @Test
+                public void singleEntry() {
+                    entry.rotateRight();
+                    assertEntryIsAlone(entry);
+                }
 
-                right.rotateLeft();
+                @Test
+                public void leftEntry() {
+                    MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
+                    entry.insertWithoutRebalancing(left);
 
-                assertNull(right.getParent());
-                assertEntryHasLeft(right, entry);
-                assertHasNoChildren(entry);
-            }
+                    left.rotateRight();
 
-            @Test
-            public void leftEntry() {
-                MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
-                entry.insertWithoutRebalancing(left);
+                    assertNull(left.getParent());
+                    assertEntryHasRight(left, entry);
+                    assertHasNoChildren(entry);
+                }
 
-                left.rotateLeft();
-                assertNull(entry.getParent());
-                assertEntryHasLeft(entry, left);
-                assertHasNoChildren(left);
-            }
+                @Test
+                public void rightEntry() {
+                    MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
+                    entry.insertWithoutRebalancing(right);
 
-            @Test
-            public void rightEntryWithLeftChild() {
-                MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
-                MyEntry<String, String> rightLeft = new MyEntry<>("1.0.1.0", "rightLeft");
+                    right.rotateRight();
 
-                entry.insertWithoutRebalancing(right);
-                entry.insertWithoutRebalancing(rightLeft);
+                    assertNull(entry.getParent());
+                    assertEntryHasRight(entry, right);
+                    assertHasNoChildren(right);
+                }
 
-                right.rotateLeft();
+                @Test
+                public void leftEntryWithRightChild() {
+                    MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
+                    MyEntry<String, String> leftRight = new MyEntry<>("0.1.1.0", "leftRight");
 
-                assertNull(right.getParent());
-                assertEntryHasLeft(right, entry);
-                assertEntryHasRight(entry, rightLeft);
-            }
+                    entry.insertWithoutRebalancing(left);
+                    entry.insertWithoutRebalancing(leftRight);
 
-            @Test
-            public void rightEntryWithGrandParent() {
-                MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
-                MyEntry<String, String> rightRight = new MyEntry<>("1.1.1.0", "rightRight");
+                    left.rotateRight();
 
-                entry.insertWithoutRebalancing(right);
-                entry.insertWithoutRebalancing(rightRight);
+                    assertNull(left.getParent());
+                    assertEntryHasRight(left, entry);
+                    assertEntryHasLeft(entry, leftRight);
+                }
 
-                rightRight.rotateLeft();
+                @Test
+                public void leftEntryWithGrandParent() {
+                    MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
+                    MyEntry<String, String> leftLeft = new MyEntry<>("0.0.1.0", "leftLeft");
 
-                assertEntryHasRight(entry, rightRight);
-                assertEntryHasLeft(rightRight, right);
-                assertHasNoChildren(right);
+                    entry.insertWithoutRebalancing(left);
+                    entry.insertWithoutRebalancing(leftLeft);
+
+                    leftLeft.rotateRight();
+
+                    assertEntryHasLeft(entry, leftLeft);
+                    assertEntryHasRight(leftLeft, left);
+                    assertHasNoChildren(left);
+                }
             }
         }
 
-        public class RotatingRight {
+        public class Coloring {
             @Test
-            public void singleEntry() {
-                entry.rotateRight();
-                assertEntryIsAlone(entry);
+            public void anEntryIsEitherBlackOrRed() {
+                assertTrue(MyEntry.BLACK);
+                assertFalse(MyEntry.RED);
+
+                entry.setColor(MyEntry.RED);
+                assertEquals(MyEntry.RED, entry.getColor());
+                assertTrue(entry.isRed());
+
+                entry.setColor(MyEntry.BLACK);
+                assertEquals(MyEntry.BLACK, entry.getColor());
+                assertFalse(entry.isRed());
             }
 
             @Test
-            public void leftEntry() {
-                MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
-                entry.insertWithoutRebalancing(left);
-
-                left.rotateRight();
-
-                assertNull(left.getParent());
-                assertEntryHasRight(left, entry);
-                assertHasNoChildren(entry);
+            public void newEntryIsBlackByDefault() {
+                assertEquals(MyEntry.BLACK, new MyEntry<>("1", "2").getColor());
             }
 
-            @Test
-            public void rightEntry() {
-                MyEntry<String, String> right = new MyEntry<>("1.1.0.0", "right");
-                entry.insertWithoutRebalancing(right);
+            public class ShouldRebalanceScenarios {
+                @Test
+                public void redEntryWithRedParentShouldRebalance() {
+                    MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                    entry.insertWithoutRebalancing(child);
 
-                right.rotateRight();
+                    entry.setColor(MyEntry.RED);
+                    child.setColor(MyEntry.RED);
 
-                assertNull(entry.getParent());
-                assertEntryHasRight(entry, right);
-                assertHasNoChildren(right);
-            }
+                    assertTrue(child.shouldRebalance());
+                }
 
-            @Test
-            public void leftEntryWithRightChild() {
-                MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
-                MyEntry<String, String> leftRight = new MyEntry<>("0.1.1.0", "leftRight");
+                @Test
+                public void blackEntryWithNoParentShouldNotRebalance() {
+                    assertFalse(entry.shouldRebalance());
+                }
 
-                entry.insertWithoutRebalancing(left);
-                entry.insertWithoutRebalancing(leftRight);
+                @Test
+                public void redRootEntryShouldRebalance() {
+                    entry.setColor(MyEntry.RED);
+                    assertTrue(entry.shouldRebalance());
+                }
 
-                left.rotateRight();
+                @Test
+                public void redEntryWithBlackParentShouldNotRebalance() {
+                    MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                    entry.insertWithoutRebalancing(child);
 
-                assertNull(left.getParent());
-                assertEntryHasRight(left, entry);
-                assertEntryHasLeft(entry, leftRight);
-            }
+                    child.setColor(MyEntry.RED);
 
-            @Test
-            public void leftEntryWithGrandParent() {
-                MyEntry<String, String> left = new MyEntry<>("0.1.0.0", "left");
-                MyEntry<String, String> leftLeft = new MyEntry<>("0.0.1.0", "leftLeft");
+                    assertFalse(child.shouldRebalance());
+                }
 
-                entry.insertWithoutRebalancing(left);
-                entry.insertWithoutRebalancing(leftLeft);
+                @Test
+                public void blackEntryWithRedParentShouldNotRebalance() {
+                    MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                    entry.insertWithoutRebalancing(child);
 
-                leftLeft.rotateRight();
+                    entry.setColor(MyEntry.RED);
 
-                assertEntryHasLeft(entry, leftLeft);
-                assertEntryHasRight(leftLeft, left);
-                assertHasNoChildren(left);
+                    assertFalse(child.shouldRebalance());
+                }
             }
         }
     }

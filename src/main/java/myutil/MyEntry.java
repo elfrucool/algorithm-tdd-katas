@@ -4,7 +4,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, V>> {
-    private enum ChildType {LEFT, RIGHT, NONE}
+    public static final boolean BLACK = true;
+    public static final boolean RED = false;
 
     public static final ChildType NONE = ChildType.NONE;
     public static final ChildType LEFT = ChildType.LEFT;
@@ -16,6 +17,8 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
     private MyEntry<K, V> parent;
     private MyEntry<K, V> left;
     private MyEntry<K, V> right;
+
+    private boolean color = BLACK;
 
     public MyEntry() {
     }
@@ -262,10 +265,28 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
         return cursor.getParent();
     }
 
+    public void setColor(boolean color) {
+        this.color = color;
+    }
+
+    public boolean getColor() {
+        return color;
+    }
+
     @Override
     public Iterator<MyEntry<K, V>> iterator() {
         return new MyEntryIterator();
     }
+
+    public boolean shouldRebalance() {
+        return isRed() && (parent != null && parent.isRed() || parent == null);
+    }
+
+    public boolean isRed() {
+        return !color;
+    }
+
+    private enum ChildType {LEFT, RIGHT, NONE}
 
     private class MyEntryIterator implements Iterator<MyEntry<K, V>> {
         private MyEntry<K, V> cursor = MyEntry.this.getSmallest();
@@ -285,6 +306,5 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
 
             return actual;
         }
-
     }
 }
