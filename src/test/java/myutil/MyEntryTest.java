@@ -169,7 +169,7 @@ public class MyEntryTest {
         }
     }
 
-    public class BasicOperationsWithSorting {
+    public class BasicOperationsWithSortingWithoutRebalancing {
         private MyEntry<String, String> left = new MyEntry<>("1", "left");
         private MyEntry<String, String> right = new MyEntry<>("3", "right");
 
@@ -183,151 +183,153 @@ public class MyEntryTest {
             entry = new MyEntry<>("2", "center");
         }
 
-        public class GivenEntryWithoutChildren {
-            @Test
-            public void insertNullIgnoresResult() {
-                entry.insertWithoutRebalancing(null);
-                assertEntryHasProperties(entry, "2", "center", NULL_PARENT);
-                assertEntryIsAlone(entry);
+        public class InsertionScenarios {
+            public class GivenEntryWithoutChildren {
+                @Test
+                public void insertNullIgnoresResult() {
+                    entry.insertWithoutRebalancing(null);
+                    assertEntryHasProperties(entry, "2", "center", NULL_PARENT);
+                    assertEntryIsAlone(entry);
+                }
+
+                @Test
+                public void insertingEntryWithSameKeyUpdatesValue() {
+                    MyEntry<String, String> shouldBeSame = new MyEntry<>("2", "should be same");
+
+                    entry.insertWithoutRebalancing(shouldBeSame);
+
+                    assertEquals("should be same", entry.getValue());
+                    assertEntryIsAlone(entry);
+                    assertEntryIsAlone(shouldBeSame);
+                }
+
+                @Test
+                public void canInsertLeftSmallerKeyEntries() {
+                    MyEntry<String, String> shouldBeLeft = new MyEntry<>("1", "left");
+                    entry.insertWithoutRebalancing(shouldBeLeft);
+                    assertEntryHasLeft(entry, shouldBeLeft);
+                }
+
+                @Test
+                public void canInsertRightBiggerKeyEntries() {
+                    MyEntry<String, String> shouldBeRight = new MyEntry<>("3", "right");
+                    entry.insertWithoutRebalancing(shouldBeRight);
+                    assertEntryHasRight(entry, shouldBeRight);
+                }
             }
 
-            @Test
-            public void insertingEntryWithSameKeyUpdatesValue() {
-                MyEntry<String, String> shouldBeSame = new MyEntry<>("2", "should be same");
+            public class GivenEntryWithTwoChildren {
+                @Before
+                public void setUp() {
+                    addTwoChildrenToRootEntry();
+                }
 
-                entry.insertWithoutRebalancing(shouldBeSame);
+                @Test
+                public void canInsertInLeftSmallerKeyEntries() {
+                    MyEntry<String, String> shouldBeLeft = new MyEntry<>("0.1", "left-left");
+                    entry.insertWithoutRebalancing(shouldBeLeft);
+                    assertEntryHasLeft(entry.getLeft(), shouldBeLeft);
+                }
 
-                assertEquals("should be same", entry.getValue());
-                assertEntryIsAlone(entry);
-                assertEntryIsAlone(shouldBeSame);
+                @Test
+                public void canInsertInRightBiggerKeyEntries() {
+                    MyEntry<String, String> shouldBeRight = new MyEntry<>("3.1", "right-right");
+                    entry.insertWithoutRebalancing(shouldBeRight);
+                    assertEntryHasRight(entry.getRight(), shouldBeRight);
+                }
+
+                @Test
+                public void insertionsAreRecursivelySorted() {
+                    MyEntry<String, String> leftRight = new MyEntry<>("1.1", "left-right");
+                    MyEntry<String, String> rightLeft = new MyEntry<>("2.1", "right-left");
+
+                    entry.insertWithoutRebalancing(leftRight);
+                    entry.insertWithoutRebalancing(rightLeft);
+
+                    assertEntryHasRight(entry.getLeft(), leftRight);
+                    assertEntryHasLeft(entry.getRight(), rightLeft);
+                }
             }
 
-            @Test
-            public void canInsertLeftSmallerKeyEntries() {
-                MyEntry<String, String> shouldBeLeft = new MyEntry<>("1", "left");
-                entry.insertWithoutRebalancing(shouldBeLeft);
-                assertEntryHasLeft(entry, shouldBeLeft);
-            }
+            public class GivenEntryWithThreeLevels {
+                private MyEntry<String, String> makeUpdatedEntryWithChildren() {
+                    MyEntry<String, String> updatedEntry = new MyEntry<>("2", "updated value");
+                    MyEntry<String, String> updatedLeft = new MyEntry<>("0.0", "new smallest is updated left");
+                    MyEntry<String, String> updatedRight = new MyEntry<>("4", "new biggest is updated right");
 
-            @Test
-            public void canInsertRightBiggerKeyEntries() {
-                MyEntry<String, String> shouldBeRight = new MyEntry<>("3", "right");
-                entry.insertWithoutRebalancing(shouldBeRight);
-                assertEntryHasRight(entry, shouldBeRight);
-            }
-        }
+                    updatedEntry.insertWithoutRebalancing(updatedLeft);
+                    updatedEntry.insertWithoutRebalancing(updatedRight);
+                    return updatedEntry;
+                }
 
-        public class GivenEntryWithTwoChildren {
-            @Before
-            public void setUp() {
-                addTwoChildrenToRootEntry();
-            }
+                private MyEntry<String, String> leftLeft;
+                private MyEntry<String, String> leftRight;
+                private MyEntry<String, String> rightLeft;
+                private MyEntry<String, String> rightRight;
 
-            @Test
-            public void canInsertInLeftSmallerKeyEntries() {
-                MyEntry<String, String> shouldBeLeft = new MyEntry<>("0.1", "left-left");
-                entry.insertWithoutRebalancing(shouldBeLeft);
-                assertEntryHasLeft(entry.getLeft(), shouldBeLeft);
-            }
+                @Before
+                public void setUp() {
+                    addTwoChildrenToRootEntry();
 
-            @Test
-            public void canInsertInRightBiggerKeyEntries() {
-                MyEntry<String, String> shouldBeRight = new MyEntry<>("3.1", "right-right");
-                entry.insertWithoutRebalancing(shouldBeRight);
-                assertEntryHasRight(entry.getRight(), shouldBeRight);
-            }
+                    leftLeft = new MyEntry<>("0.1", "left-left");  // "0" works but for just following the same convention
+                    leftRight = new MyEntry<>("1.1", "left-right");
+                    rightLeft = new MyEntry<>("2.1", "right-left");
+                    rightRight = new MyEntry<>("3.1", "right-right");
 
-            @Test
-            public void insertionsAreRecursivelySorted() {
-                MyEntry<String, String> leftRight = new MyEntry<>("1.1", "left-right");
-                MyEntry<String, String> rightLeft = new MyEntry<>("2.1", "right-left");
+                    for (MyEntry<String, String> e : Arrays.asList(leftLeft, leftRight, rightLeft, rightRight))
+                        entry.insertWithoutRebalancing(e);
+                }
 
-                entry.insertWithoutRebalancing(leftRight);
-                entry.insertWithoutRebalancing(rightLeft);
+                @Test
+                public void canGetRoot() {
+                    assertSame(entry, entry.getRoot());
+                    assertSame(entry, left.getRoot());
+                    assertSame(entry, leftLeft.getRoot());
+                }
 
-                assertEntryHasRight(entry.getLeft(), leftRight);
-                assertEntryHasLeft(entry.getRight(), rightLeft);
-            }
-        }
+                @Test
+                public void canGetSmallest() {
+                    assertSame(leftLeft, entry.getSmallest());
+                }
 
-        public class GivenEntryWithThreeLevels {
-            private MyEntry<String, String> makeUpdatedEntryWithChildren() {
-                MyEntry<String, String> updatedEntry = new MyEntry<>("2", "updated value");
-                MyEntry<String, String> updatedLeft = new MyEntry<>("0.0", "new smallest is updated left");
-                MyEntry<String, String> updatedRight = new MyEntry<>("4", "new biggest is updated right");
+                @Test
+                public void canGetBiggest() {
+                    assertSame(rightRight, entry.getBiggest());
+                }
 
-                updatedEntry.insertWithoutRebalancing(updatedLeft);
-                updatedEntry.insertWithoutRebalancing(updatedRight);
-                return updatedEntry;
-            }
+                @Test
+                public void canFindNode() {
+                    assertSame(entry, entry.find("2"));
 
-            private MyEntry<String, String> leftLeft;
-            private MyEntry<String, String> leftRight;
-            private MyEntry<String, String> rightLeft;
-            private MyEntry<String, String> rightRight;
+                    assertSame(left, entry.find("1"));
+                    assertSame(right, entry.find("3"));
 
-            @Before
-            public void setUp() {
-                addTwoChildrenToRootEntry();
+                    assertSame(leftLeft, entry.find("0.1"));
+                    assertSame(rightRight, entry.find("3.1"));
+                    assertSame(leftRight, entry.find("1.1"));
+                    assertSame(rightLeft, entry.find("2.1"));
 
-                leftLeft = new MyEntry<>("0.1", "left-left");  // "0" works but for just following the same convention
-                leftRight = new MyEntry<>("1.1", "left-right");
-                rightLeft = new MyEntry<>("2.1", "right-left");
-                rightRight = new MyEntry<>("3.1", "right-right");
+                    assertNull(entry.find("1.1.1"));
+                    assertNull(entry.find("foobar"));
+                }
 
-                for (MyEntry<String, String> e : Arrays.asList(leftLeft, leftRight, rightLeft, rightRight))
-                    entry.insertWithoutRebalancing(e);
-            }
+                @Test
+                public void findShouldStartAtRoot() {
+                    assertSame(entry.find("2.1"), leftLeft.find("2.1"));
+                }
 
-            @Test
-            public void canGetRoot() {
-                assertSame(entry, entry.getRoot());
-                assertSame(entry, left.getRoot());
-                assertSame(entry, leftLeft.getRoot());
-            }
+                @Test
+                public void insertEntyWithSameKeyUpdatesValueAndInsertsChildren() {
+                    MyEntry<String, String> updatedEntry = makeUpdatedEntryWithChildren();
+                    MyEntry<String, String> updatedLeft = updatedEntry.getLeft();
 
-            @Test
-            public void canGetSmallest() {
-                assertSame(leftLeft, entry.getSmallest());
-            }
+                    entry.insertWithoutRebalancing(updatedEntry);
 
-            @Test
-            public void canGetBiggest() {
-                assertSame(rightRight, entry.getBiggest());
-            }
-
-            @Test
-            public void canFindNode() {
-                assertSame(entry, entry.find("2"));
-
-                assertSame(left, entry.find("1"));
-                assertSame(right, entry.find("3"));
-
-                assertSame(leftLeft, entry.find("0.1"));
-                assertSame(rightRight, entry.find("3.1"));
-                assertSame(leftRight, entry.find("1.1"));
-                assertSame(rightLeft, entry.find("2.1"));
-
-                assertNull(entry.find("1.1.1"));
-                assertNull(entry.find("foobar"));
-            }
-
-            @Test
-            public void findShouldStartAtRoot() {
-                assertSame(entry.find("2.1"), leftLeft.find("2.1"));
-            }
-
-            @Test
-            public void insertEntyWithSameKeyUpdatesValueAndInsertsChildren() {
-                MyEntry<String, String> updatedEntry = makeUpdatedEntryWithChildren();
-                MyEntry<String, String> updatedLeft = updatedEntry.getLeft();
-
-                entry.insertWithoutRebalancing(updatedEntry);
-
-                assertEquals("updated value", entry.getValue());
-                assertEquals("0.0", entry.getSmallest().getKey());
-                assertEquals("4", entry.getBiggest().getKey());
-                assertSame(entry, updatedLeft.getRoot());
+                    assertEquals("updated value", entry.getValue());
+                    assertEquals("0.0", entry.getSmallest().getKey());
+                    assertEquals("4", entry.getBiggest().getKey());
+                    assertSame(entry, updatedLeft.getRoot());
+                }
             }
         }
 
