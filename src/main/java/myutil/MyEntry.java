@@ -286,6 +286,17 @@ public class MyEntry<K extends Comparable<K>, V> implements Iterable<MyEntry<K, 
         return !color;
     }
 
+    public boolean shouldRecolor() {
+        MyEntry<K, V> uncle = getUncle();
+        return isRed() && (parent == null || uncle != null && uncle.isRed());
+    }
+
+    private MyEntry<K, V> getUncle() {
+        if (parent != null && parent.parent != null)
+            return parent.getChildType() == ChildType.LEFT ? parent.parent.getRight() : parent.parent.getLeft();
+        return null;
+    }
+
     private enum ChildType {LEFT, RIGHT, NONE}
 
     private class MyEntryIterator implements Iterator<MyEntry<K, V>> {

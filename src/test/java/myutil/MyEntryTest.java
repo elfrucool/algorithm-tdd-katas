@@ -954,48 +954,135 @@ public class MyEntryTest {
                 assertEquals(MyEntry.BLACK, new MyEntry<>("1", "2").getColor());
             }
 
-            public class ShouldRebalanceScenarios {
+            public class ShouldRecolor {
                 @Test
-                public void redEntryWithRedParentShouldRebalance() {
-                    MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
-                    entry.insertWithoutRebalancing(child);
-
+                public void redRootEntryShouldRecolor() {
                     entry.setColor(MyEntry.RED);
-                    child.setColor(MyEntry.RED);
-
-                    assertTrue(child.shouldRebalance());
+                    assertTrue(entry.shouldRecolor());
                 }
 
                 @Test
-                public void blackEntryWithNoParentShouldNotRebalance() {
-                    assertFalse(entry.shouldRebalance());
+                public void blackRootEntryShouldNotRecolor() {
+                    assertFalse(entry.shouldRecolor());
                 }
 
                 @Test
-                public void redRootEntryShouldRebalance() {
-                    entry.setColor(MyEntry.RED);
-                    assertTrue(entry.shouldRebalance());
-                }
-
-                @Test
-                public void redEntryWithBlackParentShouldNotRebalance() {
+                public void redEntryWithoutGrandParentShouldNotRecolor() {
                     MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
                     entry.insertWithoutRebalancing(child);
 
                     child.setColor(MyEntry.RED);
 
-                    assertFalse(child.shouldRebalance());
+                    assertFalse(child.shouldRecolor());
                 }
 
                 @Test
-                public void blackEntryWithRedParentShouldNotRebalance() {
-                    MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
-                    entry.insertWithoutRebalancing(child);
+                public void redEntryWithRedParentAndRightRedUncleShouldRecolor() {
+                    MyEntry<String, String> parent = new MyEntry<>("0.1.0.0", "left is parent");
+                    MyEntry<String, String> uncle = new MyEntry<>("1.1.0.0", "right is uncle");
+                    MyEntry<String, String> child = new MyEntry<>("0.0.1.0", "child under test");
 
-                    entry.setColor(MyEntry.RED);
+                    entry.insertWithoutRebalancing(parent);
+                    entry.insertWithoutRebalancing(uncle);
+                    parent.insertWithoutRebalancing(child);
 
-                    assertFalse(child.shouldRebalance());
+                    parent.setColor(MyEntry.RED);
+                    uncle.setColor(MyEntry.RED);
+                    child.setColor(MyEntry.RED);
+
+                    assertTrue(child.shouldRecolor());
                 }
+
+                @Test
+                public void redEntryWithRedParentAndLeftBlackUncleShouldNotRecolor() {
+                    MyEntry<String, String> uncle = new MyEntry<>("0.1.0.0", "left is uncle");
+                    MyEntry<String, String> parent = new MyEntry<>("1.1.0.0", "right is parent");
+                    MyEntry<String, String> child = new MyEntry<>("1.1.1.0", "child under test");
+
+                    entry.insertWithoutRebalancing(uncle);
+                    entry.insertWithoutRebalancing(parent);
+                    parent.insertWithoutRebalancing(child);
+
+                    child.setColor(MyEntry.RED);
+                    parent.setColor(MyEntry.RED);
+
+                    assertFalse(child.shouldRecolor());
+                }
+
+                @Test
+                public void redEntryWithRedParentAndLeftRedUncleShouldRecolor() {
+                    MyEntry<String, String> uncle = new MyEntry<>("0.1.0.0", "left is uncle");
+                    MyEntry<String, String> parent = new MyEntry<>("1.1.0.0", "right is parent");
+                    MyEntry<String, String> child = new MyEntry<>("1.1.1.0", "child under test");
+
+                    entry.insertWithoutRebalancing(parent);
+                    entry.insertWithoutRebalancing(uncle);
+                    parent.insertWithoutRebalancing(child);
+
+                    parent.setColor(MyEntry.RED);
+                    uncle.setColor(MyEntry.RED);
+                    child.setColor(MyEntry.RED);
+
+                    assertTrue(child.shouldRecolor());
+                }
+
+                @Test
+                public void redEntryWithRedParentAndNullUncleShouldNotRecolor() {
+                    MyEntry<String, String> parent = new MyEntry<>("0.1.0.0", "left is parent");
+                    MyEntry<String, String> child = new MyEntry<>("0.0.1.0", "child under test");
+
+                    entry.insertWithoutRebalancing(parent);
+                    parent.insertWithoutRebalancing(child);
+
+                    parent.setColor(MyEntry.RED);
+                    child.setColor(MyEntry.RED);
+
+                    assertFalse(child.shouldRecolor());
+                }
+            }
+        }
+
+        public class ShouldRebalanceScenarios {
+            @Test
+            public void redEntryWithRedParentShouldRebalance() {
+                MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                entry.insertWithoutRebalancing(child);
+
+                entry.setColor(MyEntry.RED);
+                child.setColor(MyEntry.RED);
+
+                assertTrue(child.shouldRebalance());
+            }
+
+            @Test
+            public void blackEntryWithNoParentShouldNotRebalance() {
+                assertFalse(entry.shouldRebalance());
+            }
+
+            @Test
+            public void redRootEntryShouldRebalance() {
+                entry.setColor(MyEntry.RED);
+                assertTrue(entry.shouldRebalance());
+            }
+
+            @Test
+            public void redEntryWithBlackParentShouldNotRebalance() {
+                MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                entry.insertWithoutRebalancing(child);
+
+                child.setColor(MyEntry.RED);
+
+                assertFalse(child.shouldRebalance());
+            }
+
+            @Test
+            public void blackEntryWithRedParentShouldNotRebalance() {
+                MyEntry<String, String> child = new MyEntry<>("0.0.0.0", "child");
+                entry.insertWithoutRebalancing(child);
+
+                entry.setColor(MyEntry.RED);
+
+                assertFalse(child.shouldRebalance());
             }
         }
     }
