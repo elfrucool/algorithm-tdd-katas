@@ -60,7 +60,7 @@ public class Task implements Comparable<Task> {
     public int compareTo(Task o) {
         int priorityComparison = o.getPriority().compareTo(priority);
         if (priorityComparison == 0)
-            return Long.compare(o.getCreatedTimestamp(), createdTimestamp);
+            return Long.compare(createdTimestamp, o.getCreatedTimestamp());
         return priorityComparison;
     }
 

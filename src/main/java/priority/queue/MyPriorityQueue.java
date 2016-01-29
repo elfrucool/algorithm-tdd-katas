@@ -1,23 +1,32 @@
 package priority.queue;
 
-import java.util.NoSuchElementException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class MyPriorityQueue<T> {
-    private T item;
+    private SortedMap<T, Long> itemsMap = new TreeMap<>();
 
     public boolean isEmpty() {
-        return item == null;
+        return itemsMap.isEmpty();
     }
 
     public void add(T item) {
-        this.item = item;
+        if (!itemsMap.containsKey(item))
+            itemsMap.put(item, 0L);
+        itemsMap.put(item, itemsMap.get(item) + 1L);
     }
 
-    public T delete() {
-        if (isEmpty())
-            throw new NoSuchElementException();
-        T item = this.item;
-        this.item = null;
-        return item;
+    public T remove() {
+        T first = itemsMap.firstKey();
+        decrementItemAt(first);
+        return first;
+    }
+
+    protected void decrementItemAt(T key) {
+        long quantity = itemsMap.get(key);
+        if (--quantity == 0)
+            itemsMap.remove(key);
+        else
+            itemsMap.put(key, quantity);
     }
 }
