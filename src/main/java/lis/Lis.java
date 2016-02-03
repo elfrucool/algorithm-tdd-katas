@@ -8,8 +8,6 @@ public class Lis {
 
         if (length == 0)
             return 0;
-        if (length == 1)
-            return 1;
 
         int[] lis = arrayOf(1, length);
         int[] top = new int[length];
