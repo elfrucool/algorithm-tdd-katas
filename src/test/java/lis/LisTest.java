@@ -18,6 +18,6 @@ public class LisTest {
         assertEquals(2, Lis.calculate(new int[]{0, 1, 0, 1})); // noise in sequence
         assertEquals(3, Lis.calculate(new int[]{5, 1, 6, 2, 3})); // sequence of smaller numbers is greater
         assertEquals(3, Lis.calculate(new int[]{1, -5, 2, -9, -4, -8, -7})); // negative numbers
-//        assertEquals(4, Lis.calculate(new int[]{2, 5, 3, 7, 101, 18})); //
+        assertEquals(4, Lis.calculate(new int[]{2, 5, 3, 7, 101, 18})); // the original problem
     }
 }
