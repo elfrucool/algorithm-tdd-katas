@@ -12,6 +12,7 @@ public class SimpleArraySumTest {
         assertEquals(3, SimpleArraySum.calculate(new int[]{3})); // constant to scalar
         assertEquals(5, SimpleArraySum.calculate(new int[]{2, 3})); // scalar to iteration
         assertEquals(10, SimpleArraySum.calculate(new int[]{1, 2, 3, 4})); // just to show it is complete
+        assertEquals(5000000015L, SimpleArraySum.calculate(new int[]{1000000001, 1000000002, 1000000003, 1000000004, 1000000005}));
     }
 
     @Test

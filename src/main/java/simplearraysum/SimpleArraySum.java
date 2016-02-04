@@ -9,8 +9,8 @@ public class SimpleArraySum {
         System.out.println(calculate(lineToNumbers(scanner.nextLine())));
     }
 
-    public static int calculate(int[] numbers) {
-        int sum = 0;
+    public static long calculate(int[] numbers) {
+        long sum = 0;
         for (int number : numbers)
             sum += number;
         return sum;
