@@ -1,6 +1,7 @@
 package sherlock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -26,14 +27,13 @@ public class DecentNumber {
         if (numberOfFives + numberOfThrees < 3 || numberOfFives < 0)
             return "-1";
         if (numberOfFives % 3 == 0 && numberOfThrees % 5 == 0)
-            return repeatString("5", numberOfFives) + repeatString("3", numberOfThrees);
+            return repeatString('5', numberOfFives) + repeatString('3', numberOfThrees);
         return get(numberOfFives - 5, numberOfThrees + 5);
     }
 
-    private static String repeatString(String s, int times) {
-        StringBuilder repeated = new StringBuilder();
-        while (times-- > 0)
-            repeated.append(s);
-        return repeated.toString();
+    private static String repeatString(char c, int times) {
+        char[] chars = new char[times];
+        Arrays.fill(chars, c);
+        return new String(chars);
     }
 }
