@@ -14,6 +14,10 @@ public class SherlockSquares {
         int sqrtMin = (int) Math.sqrt(min);
         int sqrtMax = (int) Math.sqrt(max);
 
-        return sqrtMax - sqrtMin + (sqrtMin * sqrtMin == min ? 1 : 0);
+        return sqrtMax - sqrtMin + (isSquareOf(sqrtMin, min) ? 1 : 0);
+    }
+
+    protected static boolean isSquareOf(int sqrt, int num) {
+        return sqrt * sqrt == num;
     }
 }
