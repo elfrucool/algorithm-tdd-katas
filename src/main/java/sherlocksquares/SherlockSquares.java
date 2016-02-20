@@ -16,15 +16,11 @@ public class SherlockSquares {
 
         int numOfSquares = 0;
 
-        if (isSquareOf(sqrtMin, min))
-            numOfSquares++;
-
         numOfSquares += sqrtMax - sqrtMin;
 
-        return numOfSquares;
-    }
+        if (sqrtMin * sqrtMin == min)
+            numOfSquares++;
 
-    protected static boolean isSquareOf(double sqrt, int num) {
-        return ((int) sqrt) * ((int) sqrt) == num;
+        return numOfSquares;
     }
 }
