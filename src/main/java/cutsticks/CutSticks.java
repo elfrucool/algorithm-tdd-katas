@@ -26,8 +26,6 @@ public class CutSticks {
 
         PriorityQueue<Integer> sortedSticks = new PriorityQueue<>(withoutZeroes);
         int first = sortedSticks.remove();
-        if (sortedSticks.contains(first))
-            sortedSticks.remove();
 
         return sortedSticks.stream().map(item -> item - first).collect(Collectors.toList());
     }

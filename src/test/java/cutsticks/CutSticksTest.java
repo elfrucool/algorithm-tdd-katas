@@ -59,7 +59,7 @@ public class CutSticksTest {
         assertCut(singletonList(0), emptyList(), 0); // single case w/zero
         assertCut(asList(1, 2), singletonList(1), 2); // two cases w/value
         assertCut(asList(0, 2), emptyList(), 1); // two cases w/zero in one (just to verify)
-        assertCut(asList(3, 0, 2, 2, 4), asList(1, 2), 4); // more complex case just to verify
+        assertCut(asList(3, 0, 2, 2, 4), asList(0, 1, 2), 4); // more complex case just to verify
     }
 
     protected void assertCut(List<Integer> inputList, List<Integer> expectedRemanentSticks, int expectedNumberOfSticksCut) {
