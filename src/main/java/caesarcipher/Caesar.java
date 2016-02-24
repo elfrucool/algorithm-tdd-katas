@@ -15,7 +15,7 @@ public class Caesar {
     public static String encrypt(String s, int k) {
         char[] chars = s.toCharArray();
         for (int index = 0; index < chars.length; index++)
-            chars[index] = (char) (encryptIfConvertible(toLower(chars[index]), k) - lowerBonus(chars[index]));
+            chars[index] = toUpper(encryptIfConvertible(toLower(chars[index]), k), chars[index]);
         return new String(chars);
     }
 
@@ -27,8 +27,8 @@ public class Caesar {
         return (char) ((c - 'a' + k) % (ALPHABET_LENGTH + 1) + 'a');
     }
 
-    protected static int lowerBonus(char c) {
-        return isUpper(c) ? CASE_INCREMENT : 0;
+    protected static char toUpper(char c, char original) {
+        return isUpper(original) ? (char) (c - CASE_INCREMENT) : c;
     }
 
     protected static char toLower(char c) {
