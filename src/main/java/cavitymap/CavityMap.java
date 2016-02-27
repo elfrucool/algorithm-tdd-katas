@@ -27,16 +27,13 @@ public class CavityMap {
 
     public static char[][] find(char[][] inputMap) {
         char[][] outputMap = copyOf(inputMap);
-        if (inputMap.length > 2)
-            findWhenLengthGreaterThanTwo(inputMap, outputMap);
-        return outputMap;
-    }
 
-    protected static void findWhenLengthGreaterThanTwo(char[][] inputMap, char[][] outputMap) {
         for (int row = 1; row + 1 < inputMap.length; row++)
             for (int column = 1; column + 1 < inputMap.length; column++)
                 if (isCavity(inputMap, row, column))
                     outputMap[row][column] = 'X';
+
+        return outputMap;
     }
 
     protected static char[][] copyOf(char[][] inputMap) {
