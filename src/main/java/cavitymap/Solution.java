@@ -2,11 +2,11 @@ package cavitymap;
 
 import java.util.Scanner;
 
-public class CavityMap {
+public class Solution {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        printOutputMap(scanner.nextInt(), find(captureInputMap(scanner, scanner.nextInt())));
-
+        int length = scanner.nextInt();
+        printOutputMap(length, find(captureInputMap(scanner, length)));
     }
 
     protected static String[] captureInputMap(Scanner scanner, int length) {
