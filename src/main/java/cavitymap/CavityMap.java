@@ -1,6 +1,30 @@
 package cavitymap;
 
+import java.util.Scanner;
+
 public class CavityMap {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        printOutputMap(scanner.nextInt(), find(captureInputMap(scanner, scanner.nextInt())));
+
+    }
+
+    protected static String[] captureInputMap(Scanner scanner, int length) {
+        String[] inputMap = new String[length];
+        for (int i = 0; i < length; i++)
+            inputMap[i] = scanner.next();
+        return inputMap;
+    }
+
+    protected static void printOutputMap(int length, String[] outputMap) {
+        for (int i = 0; i < length; i++)
+            System.out.println(outputMap[i]);
+    }
+
+    public static String[] find(String[] intputMap) {
+        return toStringArray(find(toCharArrays(intputMap)));
+    }
+
     public static char[][] find(char[][] inputMap) {
         char[][] outputMap = copyOf(inputMap);
         if (inputMap.length > 2)
@@ -27,10 +51,6 @@ public class CavityMap {
                 cell > map[row + 1][column] &&
                 cell > map[row][column - 1] &&
                 cell > map[row][column + 1];
-    }
-
-    public static String[] find(String[] intputMap) {
-        return toStringArray(find(toCharArrays(intputMap)));
     }
 
     public static char[][] toCharArrays(String[] strings) {
