@@ -2,7 +2,7 @@ package cavitymap;
 
 import java.util.Scanner;
 
-public class Solution {
+public class CavityMap {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int length = scanner.nextInt();
