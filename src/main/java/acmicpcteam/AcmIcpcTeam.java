@@ -26,6 +26,9 @@ public class AcmIcpcTeam {
     }
 
     public static class BitObject {
+        private final int size;
+        private final BitSet bitSet;
+
         public int getSize() {
             return size;
         }
@@ -33,9 +36,6 @@ public class AcmIcpcTeam {
         public BitSet getBitSet() {
             return bitSet;
         }
-
-        private final int size;
-        private final BitSet bitSet;
 
         public BitObject(int size, BitSet bitSet) {
             this.size = size;
