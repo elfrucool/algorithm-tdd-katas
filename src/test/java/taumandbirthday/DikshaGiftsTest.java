@@ -23,5 +23,7 @@ public class DikshaGiftsTest {
         assertEquals(12, DikshaGifts.calculate(3, 6, 9, 1, 1)); // example 3
         assertEquals(35, DikshaGifts.calculate(7, 7, 4, 2, 1)); // example 4
         assertEquals(12, DikshaGifts.calculate(3, 3, 1, 9, 2)); // example 5
+        assertEquals(1000000000L * 1000000000L * 2L,
+                DikshaGifts.calculate(1000000000, 1000000000, 1000000000, 1000000000, 1000000000)); // biggest case
     }
 }
