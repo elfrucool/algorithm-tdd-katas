@@ -81,10 +81,9 @@ public abstract class SubArraySum {
         @Override
         public void add(int n) {
             numbersAdded++;
-
-            if (n > 0)
+            if (n >= 0 && sum >= 0) {
                 sum += n;
-            else if (numbersAdded == 1 || sum < n)
+            } else if (numbersAdded == 1 || sum < n)
                 sum = n;
         }
     }

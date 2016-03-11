@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class SubarraySumTest {
+public class SubArraySumTest {
     private void assertMax(SubArraySum subArraySum, long expected, int[] numbers) {
         for (int n : numbers)
             subArraySum.add(n);
