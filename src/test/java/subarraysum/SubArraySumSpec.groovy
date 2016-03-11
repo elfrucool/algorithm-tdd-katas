@@ -12,7 +12,7 @@ class SubArraySumSpec extends Specification {
         System.setOut(new PrintStream(out))
 
         when: "main is invoked"
-        SubArraySum.main()
+        SubArraySumX.main()
 
         then: "output should be equal to expected"
         getClass().getResourceAsStream("expected-output.txt").getText() == out.toString()
