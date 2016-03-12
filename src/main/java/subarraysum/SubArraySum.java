@@ -1,5 +1,7 @@
 package subarraysum;
 
+import java.util.Scanner;
+
 interface Problem {
     void input(int n, int index);
 
@@ -7,6 +9,24 @@ interface Problem {
 }
 
 public class SubArraySum {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int numberOfTestCases = scanner.nextInt();
+        while (numberOfTestCases-- > 0)
+            dump(maxContiguousAndNonContiguous(loadData(scanner)));
+    }
+
+    private static void dump(long[] results) {
+        System.out.printf("%d %d\n", results[0], results[1]);
+    }
+
+    private static int[] loadData(Scanner scanner) {
+        int[] numbers = new int[scanner.nextInt()];
+        for (int i = 0; i < numbers.length; i++)
+            numbers[i] = scanner.nextInt();
+        return numbers;
+    }
+
     public static long[] maxContiguousAndNonContiguous(int[] numbers) {
         Problem contiguous = new Contiguous();
         Problem nonContiguous = new NonContiguous();
