@@ -22,5 +22,6 @@ public class SubArraySumTest {
         assertSolution(new int[]{2, -3, 1}, 2L, 3L);
         assertSolution(new int[]{-1}, -1L, -1L);
         assertSolution(new int[]{-2, -1}, -1L, -1L);
+        assertSolution(new int[]{-1, 1}, 1L, 1L);
     }
 }

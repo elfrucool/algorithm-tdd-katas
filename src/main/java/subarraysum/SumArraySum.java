@@ -35,7 +35,7 @@ class NonContiguous implements Problem {
 
     @Override
     public void add(int n) {
-        if (n > 0)
+        if (max >= 0 && n > 0)
             max = max + n;
         else if (additions == 0 || max < n)
             max = n;
