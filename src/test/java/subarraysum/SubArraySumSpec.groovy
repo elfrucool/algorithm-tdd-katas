@@ -4,17 +4,18 @@ import spock.lang.Specification
 
 
 class SubArraySumSpec extends Specification {
-    def "passes all"() {
-        given: "input/output redirected"
-        System.setIn(getClass().getResourceAsStream("input.txt"))
+    def "can handle hard scenarios"() {
+        given: "hard input"
+            System.setIn(getClass().getResourceAsStream("input.txt"))
 
-        def out = new ByteArrayOutputStream()
-        System.setOut(new PrintStream(out))
+        and: "we redirect output"
+            def out = new ByteArrayOutputStream()
+            System.setOut(new PrintStream(out))
 
-        when: "main is invoked"
-        SubArraySum.main()
+        when: "main method is invoked"
+            SumArraySum.main()
 
-        then: "output should be equal to expected"
-        getClass().getResourceAsStream("expected-output.txt").getText() == out.toString()
+        then: "output is as expected"
+            getClass().getResourceAsStream("expected-output.txt").text == out as String
     }
 }
