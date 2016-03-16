@@ -1,6 +1,20 @@
 package candies;
 
+import java.util.Scanner;
+
 public class Candies {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int numberOfChildren = scanner.nextInt();
+        int[] children = new int[numberOfChildren];
+
+        for (int i = 0; i < numberOfChildren; i++)
+            children[i] = scanner.nextInt();
+
+        System.out.println(distribute(children));
+    }
+
     public static long distribute(int[] children) {
         int maxIndex = children.length - 1;
 
@@ -8,6 +22,7 @@ public class Candies {
 
         long ascendingIncrement = 0L;
         long descendingIncrement = 0L;
+
         for (int index = 0; index + 1 < children.length; index++) {
             if (children[index] < children[index + 1])
                 ascendingIncrement++;
@@ -21,6 +36,7 @@ public class Candies {
 
             candies += ascendingIncrement + descendingIncrement;
         }
+
         return candies;
     }
 }
